@@ -42,8 +42,16 @@ public class Main {
         VueInscription vueInscription = new VueInscription();
         VueConnexion vueConnexion = new VueConnexion();
         VueAdmin vueAdmin = new VueAdmin();
-        new Inscription(daoUser, vueInscription, vueConnexion, vueAdmin);
+        //new Inscription(daoUser, vueInscription, vueConnexion, vueAdmin);
 
+
+        // a mettre depuis inscription après
+        VueAccueil vueAccueil = new VueAccueil();
+        new Accueil(vueAccueil, daoHebergement ,vueConnexion);
+
+
+        VueAccueilAdmin accueilAdmin = new VueAccueilAdmin();
+        //new AccueilAdmin(accueilAdmin, daoHebergement);
 
 
         // Fermer ma connexion

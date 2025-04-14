@@ -18,21 +18,19 @@ public class HebergementDAOImpl implements HebergementDAO {
         try {
             Connection connexion = daoFactory.getConnection();
             Statement statement = connexion.createStatement();
-
             ResultSet resultats = statement.executeQuery("SELECT * FROM Hebergements");
 
             while (resultats.next()) {
-                int id = resultats.getInt("hebergement_id");
-                String nom = resultats.getString("nom");
-                String description = resultats.getString("description");
-                String adresse = resultats.getString("adresse");
-                String ville = resultats.getString("ville");
-                String pays = resultats.getString("pays");
-                int capacite = resultats.getInt("capacite");
-                double prix = resultats.getDouble("prix_par_nuit");
-                String type = resultats.getString("type");
-
-                Hebergement h = new Hebergement(id, nom, description, adresse, ville, pays, capacite, prix, type);
+                Hebergement h = new Hebergement(
+                        resultats.getInt("hebergement_id"),
+                        resultats.getString("nom"),
+                        resultats.getString("description"),
+                        resultats.getString("adresse"),
+                        resultats.getString("ville"),
+                        resultats.getString("pays"),
+                        resultats.getDouble("prix_par_nuit"),
+                        resultats.getString("categorie")
+                );
                 listeHebergements.add(h);
             }
         } catch (SQLException e) {
@@ -49,16 +47,15 @@ public class HebergementDAOImpl implements HebergementDAO {
             Connection connexion = daoFactory.getConnection();
 
             PreparedStatement ps = connexion.prepareStatement(
-                    "INSERT INTO Hebergements (nom, description, adresse, ville, pays, capacite, prix_par_nuit, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+                    "INSERT INTO Hebergements (nom, description, adresse, ville, pays, categorie, prix_par_nuit) VALUES (?, ?, ?, ?, ?, ?, ?)"
             );
             ps.setString(1, h.getNom());
             ps.setString(2, h.getDescription());
             ps.setString(3, h.getAdresse());
             ps.setString(4, h.getVille());
             ps.setString(5, h.getPays());
-            ps.setInt(6, h.getCapacite());
+            ps.setString(6, h.getCategorie());
             ps.setDouble(7, h.getPrixParNuit());
-            ps.setString(8, h.getType());
 
             ps.executeUpdate();
         } catch (SQLException e) {
@@ -85,9 +82,8 @@ public class HebergementDAOImpl implements HebergementDAO {
                         resultats.getString("adresse"),
                         resultats.getString("ville"),
                         resultats.getString("pays"),
-                        resultats.getInt("capacite"),
                         resultats.getDouble("prix_par_nuit"),
-                        resultats.getString("type")
+                        resultats.getString("categorie")
                 );
             }
         } catch (SQLException e) {
@@ -104,17 +100,16 @@ public class HebergementDAOImpl implements HebergementDAO {
             Connection connexion = daoFactory.getConnection();
 
             PreparedStatement ps = connexion.prepareStatement(
-                    "UPDATE Hebergements SET nom = ?, description = ?, adresse = ?, ville = ?, pays = ?, capacite = ?, prix_par_nuit = ?, type = ? WHERE hebergement_id = ?"
+                    "UPDATE Hebergements SET nom = ?, description = ?, adresse = ?, ville = ?, pays = ?, categorie = ?, prix_par_nuit = ? WHERE hebergement_id = ?"
             );
             ps.setString(1, h.getNom());
             ps.setString(2, h.getDescription());
             ps.setString(3, h.getAdresse());
             ps.setString(4, h.getVille());
             ps.setString(5, h.getPays());
-            ps.setInt(6, h.getCapacite());
+            ps.setString(6, h.getCategorie());
             ps.setDouble(7, h.getPrixParNuit());
-            ps.setString(8, h.getType());
-            ps.setInt(9, h.getId());
+            ps.setInt(8, h.getId());
 
             ps.executeUpdate();
         } catch (SQLException e) {

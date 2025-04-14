@@ -17,18 +17,18 @@ public class Inscription implements ActionListener {
     private VueConnexion vueConnexion;
     private VueAdmin vueAdmin;
 
+
+
     public Inscription(UserDAOImpl userDAO, VueInscription vueInscription, VueConnexion vueConnexion, VueAdmin vueAdmin) {
         this.userDAO = userDAO;
         this.vueInscription = vueInscription;
         this.vueConnexion = vueConnexion;
         this.vueAdmin = vueAdmin;
 
-        // Initialisation: afficher la vue de connexion au démarrage
         vueConnexion.setVisible(true);
         vueInscription.setVisible(false);
         vueAdmin.setVisible(false);
 
-        // On lie les boutons ici
         this.vueInscription.ajouterEcouteur(this);
         this.vueConnexion.ajouterEcouteur(this);
         this.vueAdmin.ajouterEcouteur(this);
@@ -72,6 +72,7 @@ public class Inscription implements ActionListener {
                     ///  verifier si user ancien (avec chercher dans bdd)
                     User user = new User(emailC, mdpC, "ancien");
                     vueConnexion.afficherMessage("Heureux de vous revoir " + user.getNom());
+
                 }
                 break;
 
@@ -88,15 +89,16 @@ public class Inscription implements ActionListener {
                 break;
 
             case "ADMIN":
-                String emailA = vueConnexion.getEmail();
-                String mdpA = vueConnexion.getMotDePasse();
+                // Gérer connexion Admin
+                String emailA = vueAdmin.getEmail();
+                String mdpA = vueAdmin.getMotDePasse();
 
                 if (emailA.isEmpty() || mdpA.isEmpty()) {
-                    vueConnexion.afficherMessage("Tous les champs doivent être remplis.");
+                    vueAdmin.afficherMessage("Tous les champs doivent être remplis.");
                 } else {
                     ///  verifier si user admin (avec chercher dans bdd)
                     User user = new User(emailA, mdpA, "admin");
-                    vueConnexion.afficherMessage("Heureux de vous revoir " + user.getNom());
+                    vueAdmin.afficherMessage("Heureux de vous revoir " + user.getNom());
                 }
                 break;
 
