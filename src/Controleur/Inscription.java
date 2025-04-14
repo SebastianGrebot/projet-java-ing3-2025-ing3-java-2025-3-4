@@ -2,34 +2,45 @@ package Controleur;
 
 import Dao.UserDAOImpl;
 import Modele.User;
+import Vue.VueAdmin;
 import Vue.VueConnexion;
 import Vue.VueInscription;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+
 public class Inscription implements ActionListener {
 
     private UserDAOImpl userDAO;
     private VueInscription vueInscription;
     private VueConnexion vueConnexion;
+    private VueAdmin vueAdmin;
 
-    public Inscription(UserDAOImpl userDAO, VueInscription vueInscription, VueConnexion vueConnexion) {
+    public Inscription(UserDAOImpl userDAO, VueInscription vueInscription, VueConnexion vueConnexion, VueAdmin vueAdmin) {
         this.userDAO = userDAO;
         this.vueInscription = vueInscription;
         this.vueConnexion = vueConnexion;
+        this.vueAdmin = vueAdmin;
 
-        // on lie les boutons ici
+        // Initialisation: afficher la vue de connexion au démarrage
+        vueConnexion.setVisible(true);
+        vueInscription.setVisible(false);
+        vueAdmin.setVisible(false);
+
+        // On lie les boutons ici
         this.vueInscription.ajouterEcouteur(this);
         this.vueConnexion.ajouterEcouteur(this);
+        this.vueAdmin.ajouterEcouteur(this);
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         String action = e.getActionCommand();
 
         switch (action) {
-            // Cas pour l'inscription dans la page d'inscription
             case "SINSCRIPTION":
+                // Gérer l'inscription
                 String nom = vueInscription.getNom();
                 String prenom = vueInscription.getPrenom();
                 String email = vueInscription.getEmail();
@@ -44,32 +55,63 @@ public class Inscription implements ActionListener {
                 }
                 break;
 
-            // Cas pour la redirection vers la page de connexion depuis la page d'inscription
             case "CONNEXION":
-                vueInscription.setVisible(false);  // On cache la fenêtre d'inscription
-                vueConnexion.setVisible(true);    // On montre la fenêtre de connexion
+                // Passer à la page de connexion
+                vueInscription.setVisible(false);
+                vueConnexion.setVisible(true);
                 break;
 
-            // Cas pour la connexion dans la page de connexion
             case "CONNEXION_PAGE":
+                // Gérer la connexion
                 String emailC = vueConnexion.getEmail();
                 String mdpC = vueConnexion.getMotDePasse();
 
                 if (emailC.isEmpty() || mdpC.isEmpty()) {
                     vueConnexion.afficherMessage("Tous les champs doivent être remplis.");
                 } else {
+                    ///  verifier si user ancien (avec chercher dans bdd)
                     User user = new User(emailC, mdpC, "ancien");
                     vueConnexion.afficherMessage("Heureux de vous revoir " + user.getNom());
                 }
                 break;
 
-            // Cas pour la redirection vers la page d'inscription depuis la page de connexion
             case "INSCRIPTION_PAGE":
-                vueConnexion.setVisible(false);  // On cache la fenêtre de connexion
-                vueInscription.setVisible(true); // On montre la fenêtre d'inscription
+                // Passer à la page d'inscription
+                vueConnexion.setVisible(false);
+                vueInscription.setVisible(true);
                 break;
 
-            // Cas par défaut pour gérer les actions inconnues
+            case "ADMIN_CONNEXION":
+                // Passer à la page Admin
+                vueConnexion.setVisible(false);
+                vueAdmin.setVisible(true);
+                break;
+
+            case "ADMIN":
+                String emailA = vueConnexion.getEmail();
+                String mdpA = vueConnexion.getMotDePasse();
+
+                if (emailA.isEmpty() || mdpA.isEmpty()) {
+                    vueConnexion.afficherMessage("Tous les champs doivent être remplis.");
+                } else {
+                    ///  verifier si user admin (avec chercher dans bdd)
+                    User user = new User(emailA, mdpA, "admin");
+                    vueConnexion.afficherMessage("Heureux de vous revoir " + user.getNom());
+                }
+                break;
+
+            case "RETOUR_CONNEXION":
+                // Retour à la page de connexion depuis la page Admin
+                vueAdmin.setVisible(false);
+                vueConnexion.setVisible(true);
+                break;
+
+            case "RETOUR_INSCRIPTION":
+                // Retour à la page de connexion depuis la page d'inscription
+                vueInscription.setVisible(false);
+                vueConnexion.setVisible(true);
+                break;
+
             default:
                 vueInscription.afficherMessage("Action inconnue : " + action);
         }

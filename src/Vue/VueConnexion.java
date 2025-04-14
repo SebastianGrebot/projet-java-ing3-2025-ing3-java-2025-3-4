@@ -3,11 +3,10 @@ package Vue;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
-
 public class VueConnexion extends JFrame {
     private JTextField champEmail;
     private JPasswordField champMdp;
-    private JButton boutonConnexion, boutonInscription;
+    private JButton boutonConnexion, boutonInscription, boutonConnexionAdmin;
 
     public VueConnexion() {
         setTitle("Connexion");
@@ -26,15 +25,19 @@ public class VueConnexion extends JFrame {
         boutonInscription = new JButton("Je n'ai pas de compte");
         boutonInscription.setActionCommand("INSCRIPTION_PAGE");
 
+        boutonConnexionAdmin = new JButton("Connexion Admin");
+        boutonConnexionAdmin.setActionCommand("ADMIN_CONNEXION");
+        boutonConnexionAdmin.setFont(new Font("Arial", Font.PLAIN, 10)); // Petit texte
+
         panel.add(new JLabel("Email :"));
         panel.add(champEmail);
         panel.add(new JLabel("Mot de passe :"));
         panel.add(champMdp);
         panel.add(boutonConnexion);
         panel.add(boutonInscription);
+        panel.add(boutonConnexionAdmin);
 
         add(panel);
-        setVisible(true);
     }
 
     public String getEmail() {
@@ -48,6 +51,7 @@ public class VueConnexion extends JFrame {
     public void ajouterEcouteur(ActionListener listener) {
         boutonConnexion.addActionListener(listener);
         boutonInscription.addActionListener(listener);
+        boutonConnexionAdmin.addActionListener(listener); // Ajout du listener admin
     }
 
     public void afficherMessage(String message) {

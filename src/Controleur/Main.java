@@ -41,7 +41,8 @@ public class Main {
         ///  inscription
         VueInscription vueInscription = new VueInscription();
         VueConnexion vueConnexion = new VueConnexion();
-        new Inscription(daoUser, vueInscription, vueConnexion);
+        VueAdmin vueAdmin = new VueAdmin();
+        new Inscription(daoUser, vueInscription, vueConnexion, vueAdmin);
 
 
 

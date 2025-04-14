@@ -4,6 +4,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 
+
+// Dans VueInscription.java
 public class VueInscription extends JFrame {
     private JTextField champNom, champPrenom, champEmail;
     private JPasswordField champMdp;
@@ -26,7 +28,7 @@ public class VueInscription extends JFrame {
         boutonInscription.setActionCommand("SINSCRIPTION");
 
         boutonConnexion = new JButton("J'ai déjà un compte");
-        boutonConnexion.setActionCommand("CONNEXION");
+        boutonConnexion.setActionCommand("RETOUR_INSCRIPTION");
 
         panel.add(new JLabel("Nom :"));
         panel.add(champNom);
@@ -40,7 +42,6 @@ public class VueInscription extends JFrame {
         panel.add(boutonConnexion);
 
         add(panel);
-        setVisible(true);
     }
 
     public String getNom() {
