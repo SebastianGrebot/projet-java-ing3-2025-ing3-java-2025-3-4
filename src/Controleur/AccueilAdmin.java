@@ -15,18 +15,28 @@ public class AccueilAdmin implements ActionListener {
     public AccueilAdmin(VueAccueilAdmin vue, HebergementDAO hebergementDAO) {
         this.vue = vue;
         this.hebergementDAO = hebergementDAO;
+
+        // Attacher les listeners ici, mais ne pas afficher tout de suite
         this.vue.ajouterEcouteur(this);
-        this.vue.setVisible(true);
+    }
+
+    public void afficherAccueilAdmin() {
+        // Tu peux ajouter d'autres logiques d'initialisation ici si besoin
+        vue.setVisible(true);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         String action = e.getActionCommand();
 
-        if (action.equals("AJOUTER_HEBERGEMENT")) {
-            ajouterHebergement();
-        } else if (action.equals("DECONNEXION")) {
-            vue.dispose();
+        switch (action) {
+            case "AJOUTER_HEBERGEMENT":
+                ajouterHebergement();
+                break;
+
+            case "DECONNEXION":
+                vue.dispose();
+                break;
         }
     }
 

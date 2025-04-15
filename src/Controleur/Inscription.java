@@ -17,21 +17,27 @@ public class Inscription implements ActionListener {
     private VueConnexion vueConnexion;
     private VueAdmin vueAdmin;
 
+    private Accueil accueil;
+    private AccueilAdmin accueilAdmin;
 
-
-    public Inscription(UserDAOImpl userDAO, VueInscription vueInscription, VueConnexion vueConnexion, VueAdmin vueAdmin) {
+    public Inscription(UserDAOImpl userDAO, VueInscription vueInscription, VueConnexion vueConnexion, VueAdmin vueAdmin, Accueil accueil, AccueilAdmin accueilAdmin) {
         this.userDAO = userDAO;
         this.vueInscription = vueInscription;
         this.vueConnexion = vueConnexion;
         this.vueAdmin = vueAdmin;
+        this.accueil = accueil;
+        this.accueilAdmin = accueilAdmin;
 
         vueConnexion.setVisible(true);
         vueInscription.setVisible(false);
         vueAdmin.setVisible(false);
 
+
         this.vueInscription.ajouterEcouteur(this);
         this.vueConnexion.ajouterEcouteur(this);
         this.vueAdmin.ajouterEcouteur(this);
+
+        ///  rajouter ecouteur pour accueil??
     }
 
     @Override
@@ -52,6 +58,7 @@ public class Inscription implements ActionListener {
                     User user = new User(prenom, nom, email, mdp, "nouveau");
                     userDAO.ajouter(user);
                     vueInscription.afficherMessage("Bienvenue " + prenom + " ! Inscription réussie");
+                    accueil.afficherAccueil();
                 }
                 break;
 
@@ -69,10 +76,15 @@ public class Inscription implements ActionListener {
                 if (emailC.isEmpty() || mdpC.isEmpty()) {
                     vueConnexion.afficherMessage("Tous les champs doivent être remplis.");
                 } else {
-                    ///  verifier si user ancien (avec chercher dans bdd)
-                    User user = new User(emailC, mdpC, "ancien");
-                    vueConnexion.afficherMessage("Heureux de vous revoir " + user.getNom());
-
+                    // quand est ce quon set user a ancien???
+                    ///  ici normalement ancien et pas nouveau
+                    User user = userDAO.chercher(emailC, mdpC, "nouveau");
+                    if (user != null) {
+                        vueConnexion.afficherMessage("Heureux de vous revoir " + user.getNom());
+                        accueil.afficherAccueil();
+                    } else {
+                        vueConnexion.afficherMessage("Email ou mot de passe incorrect.");
+                    }
                 }
                 break;
 
@@ -96,9 +108,13 @@ public class Inscription implements ActionListener {
                 if (emailA.isEmpty() || mdpA.isEmpty()) {
                     vueAdmin.afficherMessage("Tous les champs doivent être remplis.");
                 } else {
-                    ///  verifier si user admin (avec chercher dans bdd)
-                    User user = new User(emailA, mdpA, "admin");
-                    vueAdmin.afficherMessage("Heureux de vous revoir " + user.getNom());
+                    User user = userDAO.chercher(emailA, mdpA, "admin");
+                    if (user != null) {
+                        vueConnexion.afficherMessage("Heureux de vous revoir " + user.getNom());
+                        accueilAdmin.afficherAccueilAdmin();
+                    } else {
+                        vueConnexion.afficherMessage("Email ou mot de passe incorrect ou vous n'avez pas les droits");
+                    }
                 }
                 break;
 

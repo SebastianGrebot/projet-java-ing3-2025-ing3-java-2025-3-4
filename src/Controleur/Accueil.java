@@ -22,7 +22,8 @@ public class Accueil implements ActionListener {
 
         this.vueAccueil.ajouterEcouteur(this);
 
-        afficherAccueil();
+        //afficherAccueil();
+        vueAccueil.setVisible(false);
     }
 
     public void afficherAccueil() {

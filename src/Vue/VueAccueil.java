@@ -20,13 +20,14 @@ public class VueAccueil extends JFrame {
     private JButton boutonDeconnexion;
 
     public VueAccueil() {
-        setTitle("Accueil - Hébergements");
-        setSize(800, 600);
+        setTitle("Accueil - Rechercher un Hébergement");
+        setSize(1000, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
         // --- Barre de recherche ---
         JPanel panelRecherche = new JPanel(new GridLayout(2, 5, 10, 10));
+        panelRecherche.setBorder(BorderFactory.createTitledBorder("Rechercher un hébergement"));
 
         champLieu = new JTextField();
         spinnerPersonnes = new JSpinner(new SpinnerNumberModel(1, 1, 20, 1));
@@ -48,44 +49,55 @@ public class VueAccueil extends JFrame {
         panelRecherche.add(boutonRecherche);
 
         // --- Tableau des hébergements ---
-        tableModel = new DefaultTableModel(new Object[]{"Nom", "Prix", "Options"}, 0) {
+        tableModel = new DefaultTableModel(
+                new Object[]{"Nom", "Ville", "Pays", "Catégorie", "Description", "Prix (€)", "Sélectionner"}, 0) {
             @Override
             public Class<?> getColumnClass(int columnIndex) {
-                if (columnIndex == 2) return Boolean.class; // Colonne options = checkbox
+                if (columnIndex == 6) return Boolean.class; // Checkbox
                 return String.class;
             }
 
             @Override
             public boolean isCellEditable(int row, int column) {
-                return column == 2; // Seule la colonne options est modifiable
+                return column == 6; // Seulement la case à cocher
             }
         };
 
         tableHebergements = new JTable(tableModel);
+        tableHebergements.setRowHeight(50); // Hauteur plus grande pour la description
         JScrollPane scrollPane = new JScrollPane(tableHebergements);
 
-        // --- Bouton Déconnexion ---
+        // --- Déconnexion ---
         boutonDeconnexion = new JButton("Déconnexion");
         boutonDeconnexion.setActionCommand("DECONNEXION");
 
         JPanel panelBas = new JPanel();
         panelBas.add(boutonDeconnexion);
 
-        // --- Composition principale ---
-        setLayout(new BorderLayout());
+        // --- Composition ---
+        setLayout(new BorderLayout(10, 10));
         add(panelRecherche, BorderLayout.NORTH);
         add(scrollPane, BorderLayout.CENTER);
         add(panelBas, BorderLayout.SOUTH);
     }
 
+    // Remplissage du tableau
     public void afficherListeHebergements(ArrayList<Hebergement> hebergements) {
-        tableModel.setRowCount(0); // Vide le tableau
+        tableModel.setRowCount(0); // Nettoie l'ancien contenu
         for (Hebergement h : hebergements) {
-            // TODO: options réelles à parser, ici on met un simple checkbox décoché
-            tableModel.addRow(new Object[]{h.getNom(), h.getPrixParNuit(), false});
+            tableModel.addRow(new Object[]{
+                    h.getNom(),
+                    h.getVille(),
+                    h.getPays(),
+                    h.getCategorie(),
+                    h.getDescription(),
+                    h.getPrixParNuit() + " €",
+                    false
+            });
         }
     }
 
+    // Getters pour les filtres
     public String getLieuRecherche() {
         return champLieu.getText();
     }
@@ -102,11 +114,13 @@ public class VueAccueil extends JFrame {
         return champDateFin.getText();
     }
 
+    // Pour attacher les contrôleurs
     public void ajouterEcouteur(ActionListener listener) {
         boutonRecherche.addActionListener(listener);
         boutonDeconnexion.addActionListener(listener);
     }
 
+    // Afficher une pop-up
     public void afficherMessage(String message) {
         JOptionPane.showMessageDialog(this, message);
     }
