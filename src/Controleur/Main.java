@@ -16,8 +16,7 @@ public class Main {
         VueHebergement vueHebergement = new VueHebergement();
         UserDAOImpl daoUser = new UserDAOImpl(dao);
         VueUser vueUser = new VueUser();
-        ReservationDAOImpl daoReservation = new ReservationDAOImpl(dao);
-        VueReservation vueReservation = new VueReservation();
+
 
         // Récupérer la liste des produits de la base de données avec l'objet prodao de la classe ProduitDAOImpl
         ArrayList<Hebergement> hebergements = daoHebergement.getAll();
@@ -31,11 +30,6 @@ public class Main {
         // Afficher la liste des clients récupérés avec l'objet vuecli de la classe VueClient
         vueUser.afficherListeClients(users);
 
-        // Récupérer la liste des commandes de la base de données avec l'objet comdao de la classe CommanderDAOImpl
-        ArrayList<Reservation> achats = daoReservation.getAll();
-
-        // Afficher la liste des commandes récupérées avec l'objet vuecom de la classe VueCommander
-        vueReservation.afficherListeCommandes(achats, dao);
 
 
         ///  inscription
@@ -43,22 +37,23 @@ public class Main {
         VueConnexion vueConnexion = new VueConnexion();
         VueAdmin vueAdmin = new VueAdmin();
 
-        VueAccueil vueAccueil = new VueAccueil();
-        Accueil accueil = new Accueil(vueAccueil, daoHebergement , vueConnexion);
 
+        ///  accueil client
+        VueAccueil vueAccueil = new VueAccueil();
+
+        ReservationDAOImpl daoReservation = new ReservationDAOImpl(dao);
+        VueReservation vueReservation = new VueReservation(vueAccueil);
+        //  reservation
+        Reserver reserver = new Reserver(vueAccueil, daoHebergement, daoReservation, vueReservation);
+
+        Accueil accueil = new Accueil(vueAccueil, daoHebergement , vueConnexion, reserver, vueReservation, daoReservation);
+
+        /// accueil admin
         VueAccueilAdmin vueAccueilAdmin = new VueAccueilAdmin();
         AccueilAdmin accueilAdmin = new AccueilAdmin(vueAccueilAdmin, daoHebergement);
 
         new Inscription(daoUser, vueInscription, vueConnexion, vueAdmin, accueil, accueilAdmin);
 
-
-        // a mettre depuis inscription après
-        //VueAccueil vueAccueil = new VueAccueil();
-        //new Accueil(vueAccueil, daoHebergement ,vueConnexion);
-
-        /// ajout hebergement (via admin) - a deplacer et rajouter options
-        //VueAccueilAdmin accueilAdmin = new VueAccueilAdmin();
-        //new AccueilAdmin(accueilAdmin, daoHebergement);
 
 
         // Fermer ma connexion
