@@ -53,7 +53,7 @@ public class Reserver implements ActionListener {
 
         // Créer une nouvelle réservation
         Reservation reservation = new Reservation(
-                1, // id_utilisateur (en fonction de l'utilisateur connecté)
+                Inscription.getUtilisateurId(), // id_utilisateur (en fonction de l'utilisateur connecté)
                 vueAccueil.getHebergementSelectionne().getId(), // id hebergement
                 sqlDateArrivee,  // Date d'arrivée sous forme de java.sql.Date
                 sqlDateDepart,   // Date de départ sous forme de java.sql.Date

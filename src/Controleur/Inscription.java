@@ -9,9 +9,20 @@ import Vue.VueInscription;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-
 public class Inscription implements ActionListener {
 
+    // 🔥 Utilisateur connecté (accessible partout)
+    private static User utilisateurConnecte = null;
+
+    public static User getUtilisateurConnecte() {
+        return utilisateurConnecte;
+    }
+
+    public static int getUtilisateurId() {
+        return utilisateurConnecte != null ? utilisateurConnecte.getId() : -1;
+    }
+
+    // --- Attributs ---
     private UserDAOImpl userDAO;
     private VueInscription vueInscription;
     private VueConnexion vueConnexion;
@@ -32,12 +43,10 @@ public class Inscription implements ActionListener {
         vueInscription.setVisible(false);
         vueAdmin.setVisible(false);
 
-
+        // Ajout des écouteurs d'actions
         this.vueInscription.ajouterEcouteur(this);
         this.vueConnexion.ajouterEcouteur(this);
         this.vueAdmin.ajouterEcouteur(this);
-
-        ///  rajouter ecouteur pour accueil??
     }
 
     @Override
@@ -45,8 +54,8 @@ public class Inscription implements ActionListener {
         String action = e.getActionCommand();
 
         switch (action) {
+
             case "SINSCRIPTION":
-                // Gérer l'inscription
                 String nom = vueInscription.getNom();
                 String prenom = vueInscription.getPrenom();
                 String email = vueInscription.getEmail();
@@ -55,31 +64,35 @@ public class Inscription implements ActionListener {
                 if (nom.isEmpty() || prenom.isEmpty() || email.isEmpty() || mdp.isEmpty()) {
                     vueInscription.afficherMessage("Tous les champs doivent être remplis.");
                 } else {
-                    User user = new User(prenom, nom, email, mdp, "nouveau");
-                    userDAO.ajouter(user);
+                    User userI = new User(prenom, nom, email, mdp, "nouveau");
+                    userDAO.ajouter(userI);
+
+                    User user = userDAO.chercher(email, mdp, "nouveau");
+
+                    utilisateurConnecte = user; // On garde l'utilisateur connecté
+
                     vueInscription.afficherMessage("Bienvenue " + prenom + " ! Inscription réussie");
                     accueil.afficherAccueil();
                 }
                 break;
 
             case "CONNEXION":
-                // Passer à la page de connexion
                 vueInscription.setVisible(false);
                 vueConnexion.setVisible(true);
                 break;
 
             case "CONNEXION_PAGE":
-                // Gérer la connexion
                 String emailC = vueConnexion.getEmail();
                 String mdpC = vueConnexion.getMotDePasse();
 
                 if (emailC.isEmpty() || mdpC.isEmpty()) {
                     vueConnexion.afficherMessage("Tous les champs doivent être remplis.");
                 } else {
-                    // quand est ce quon set user a ancien???
-                    ///  ici normalement ancien et pas nouveau
                     User user = userDAO.chercher(emailC, mdpC, "nouveau");
+
                     if (user != null) {
+                        utilisateurConnecte = user; // Connexion réussie = on stocke l'utilisateur
+
                         vueConnexion.afficherMessage("Heureux de vous revoir " + user.getNom());
                         accueil.afficherAccueil();
                     } else {
@@ -89,19 +102,16 @@ public class Inscription implements ActionListener {
                 break;
 
             case "INSCRIPTION_PAGE":
-                // Passer à la page d'inscription
                 vueConnexion.setVisible(false);
                 vueInscription.setVisible(true);
                 break;
 
             case "ADMIN_CONNEXION":
-                // Passer à la page Admin
                 vueConnexion.setVisible(false);
                 vueAdmin.setVisible(true);
                 break;
 
             case "ADMIN":
-                // Gérer connexion Admin
                 String emailA = vueAdmin.getEmail();
                 String mdpA = vueAdmin.getMotDePasse();
 
@@ -109,7 +119,10 @@ public class Inscription implements ActionListener {
                     vueAdmin.afficherMessage("Tous les champs doivent être remplis.");
                 } else {
                     User user = userDAO.chercher(emailA, mdpA, "admin");
+
                     if (user != null) {
+                        utilisateurConnecte = user; // Connexion admin = aussi stockée
+
                         vueConnexion.afficherMessage("Heureux de vous revoir " + user.getNom());
                         accueilAdmin.afficherAccueilAdmin();
                     } else {
@@ -119,13 +132,11 @@ public class Inscription implements ActionListener {
                 break;
 
             case "RETOUR_CONNEXION":
-                // Retour à la page de connexion depuis la page Admin
                 vueAdmin.setVisible(false);
                 vueConnexion.setVisible(true);
                 break;
 
             case "RETOUR_INSCRIPTION":
-                // Retour à la page de connexion depuis la page d'inscription
                 vueInscription.setVisible(false);
                 vueConnexion.setVisible(true);
                 break;
