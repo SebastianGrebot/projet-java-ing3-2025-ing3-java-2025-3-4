@@ -4,18 +4,27 @@ import Dao.HebergementDAOImpl;
 import Dao.ReservationDAOImpl;
 import Modele.Hebergement;
 import Modele.Reservation;
+import Modele.User;
 import Vue.VueAccueil;
+import Vue.VuePaiement;
 import Vue.VueReservation;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Date;
+import java.sql.Date;
 
 public class Reserver implements ActionListener {
     private VueAccueil vueAccueil;
     private HebergementDAOImpl hebergementDAO;
     private ReservationDAOImpl reservationDAO;
     private VueReservation vueReservation;
+    private VuePaiement vuePaiement;
+
+    private java.util.Date dateArrivee;
+    private java.util.Date dateDepart;
+    private int nbAdultes;
+    private int nbEnfants;
+    private double prixTotal;
 
     public Reserver(VueAccueil vueAccueil, HebergementDAOImpl hebergementDAO, ReservationDAOImpl reservationDAO, VueReservation vueReservation) {
         this.vueAccueil = vueAccueil;
@@ -23,54 +32,60 @@ public class Reserver implements ActionListener {
         this.reservationDAO = reservationDAO;
         this.vueReservation = vueReservation;
 
-        this.vueReservation.ajouterEcouteur(this);  // Ajouter l'écouteur d'événements
+        this.vueReservation.ajouterEcouteur(this);  // Ajoute l'écouteur pour "Valider réservation"
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         String action = e.getActionCommand();
 
-        // Gestion du bouton "Réserver" pour réserver un hébergement
-        if ("VALIDER_RESERVATION".equals(action)) {
+        switch (action) {
+            case "VALIDER_RESERVATION":
+                lancerVuePaiement(); // Affiche la page de paiement
+                break;
 
-            // Ici vous pouvez récupérer les informations de l'hébergement et de la réservation
-            reserverHebergement();
+            case "PAYER":
+                enregistrerReservation(); // Effectue l’enregistrement en base
+                vuePaiement.setVisible(false);
+                vueAccueil.setVisible(true);
+                vueAccueil.afficherMessage("Paiement confirmé. Votre réservation est enregistrée !");
+                break;
         }
     }
 
+    private void lancerVuePaiement() {
+        // Récupérer les infos de la réservation
+        dateArrivee = vueReservation.getDateArrivee();
+        dateDepart = vueReservation.getDateDepart();
+        nbAdultes = vueReservation.getNbAdultes();
+        nbEnfants = vueReservation.getNbEnfants();
+        prixTotal = vueReservation.getPrixTotal();
 
-    private void reserverHebergement() {
-        // Récupérer les informations de réservation depuis la vueReservation
-        java.util.Date dateArrivee = vueReservation.getDateArrivee();
-        java.util.Date dateDepart = vueReservation.getDateDepart();
-        int nbAdultes = vueReservation.getNbAdultes();
-        int nbEnfants = vueReservation.getNbEnfants();
-        double prixTotal = vueReservation.getPrixTotal();
+        Hebergement hebergement = vueAccueil.getHebergementSelectionne();
+        User user = Inscription.getUtilisateurConnecte();
 
-        // Convertir les java.util.Date en java.sql.Date
-        java.sql.Date sqlDateArrivee = new java.sql.Date(dateArrivee.getTime());
-        java.sql.Date sqlDateDepart = new java.sql.Date(dateDepart.getTime());
+        vuePaiement = new VuePaiement(user, hebergement, dateArrivee, dateDepart, prixTotal);
+        vuePaiement.ajouterEcouteur(this); // Pour écouter le bouton "Payer"
+        vueReservation.setVisible(false);
+        vuePaiement.setVisible(true);
+    }
 
-        // Créer une nouvelle réservation
+    private void enregistrerReservation() {
+        java.sql.Date sqlDateArrivee = new Date(dateArrivee.getTime());
+        java.sql.Date sqlDateDepart = new Date(dateDepart.getTime());
+
         Reservation reservation = new Reservation(
-                Inscription.getUtilisateurId(), // id_utilisateur (en fonction de l'utilisateur connecté)
-                vueAccueil.getHebergementSelectionne().getId(), // id hebergement
-                sqlDateArrivee,  // Date d'arrivée sous forme de java.sql.Date
-                sqlDateDepart,   // Date de départ sous forme de java.sql.Date
+                Inscription.getUtilisateurId(),
+                vueAccueil.getHebergementSelectionne().getId(),
+                sqlDateArrivee,
+                sqlDateDepart,
                 nbAdultes,
                 nbEnfants,
                 prixTotal,
-                "CONFIRMEE",  // Tu peux définir un statut par défaut ou le récupérer d'une autre manière
-                new java.sql.Date(System.currentTimeMillis())  // Date de création : date actuelle
+                "CONFIRMEE",
+                new Date(System.currentTimeMillis())
         );
 
-        // Ajouter la réservation à la base de données
         reservationDAO.ajouter(reservation);
-
-        // Afficher un message de confirmation dans la vueAccueil
-        vueAccueil.afficherMessage("Réservation effectuée pour : du " + sqlDateArrivee + " au " + sqlDateDepart);
-        vueReservation.setVisible(false);
-        vueAccueil.setVisible(true);
     }
-
 }
