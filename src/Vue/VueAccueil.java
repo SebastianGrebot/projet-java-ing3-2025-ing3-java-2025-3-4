@@ -3,7 +3,6 @@ package Vue;
 import Modele.Hebergement;
 
 import javax.swing.*;
-import javax.swing.event.TableModelEvent;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -19,6 +18,9 @@ public class VueAccueil extends JFrame {
     private JTextField champDateDebut;
     private JTextField champDateFin;
     private JButton boutonRecherche;
+
+    private JButton boutonAccueil;
+    private JButton boutonMesReservations;
     private JButton boutonDeconnexion;
 
     private ActionListener actionListener;
@@ -31,6 +33,22 @@ public class VueAccueil extends JFrame {
         setSize(1000, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
+
+        // --- Barre de navigation en haut ---
+        JPanel barreNavigation = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        boutonAccueil = new JButton("Accueil");
+        boutonAccueil.setActionCommand("NAV_ACCUEIL");
+
+        boutonMesReservations = new JButton("Mes Réservations");
+        boutonMesReservations.setActionCommand("NAV_MES_RESERVATIONS");
+
+        boutonDeconnexion = new JButton("Déconnexion");
+        boutonDeconnexion.setActionCommand("DECONNEXION");
+
+        barreNavigation.add(boutonAccueil);
+        barreNavigation.add(boutonMesReservations);
+        barreNavigation.add(Box.createHorizontalStrut(20)); // espacement
+        barreNavigation.add(boutonDeconnexion);
 
         // --- Barre de recherche ---
         JPanel panelRecherche = new JPanel(new GridLayout(2, 5, 10, 10));
@@ -47,7 +65,7 @@ public class VueAccueil extends JFrame {
         panelRecherche.add(new JLabel("Personnes :"));
         panelRecherche.add(new JLabel("Date d'arrivée :"));
         panelRecherche.add(new JLabel("Date de départ :"));
-        panelRecherche.add(new JLabel(""));
+        panelRecherche.add(new JLabel("")); // vide
 
         panelRecherche.add(champLieu);
         panelRecherche.add(spinnerPersonnes);
@@ -60,7 +78,7 @@ public class VueAccueil extends JFrame {
                 new Object[]{"Nom", "Ville", "Pays", "Catégorie", "Description", "Prix (€)", "Réserver"}, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return column == 6; // Seule la colonne "Réserver" est interactive
+                return column == 6; // Seule la colonne bouton est éditable
             }
 
             @Override
@@ -73,22 +91,17 @@ public class VueAccueil extends JFrame {
         tableHebergements.setRowHeight(40);
         JScrollPane scrollPane = new JScrollPane(tableHebergements);
 
-        // --- Boutons "Réserver" dans la colonne ---
         tableHebergements.getColumn("Réserver").setCellRenderer(new ButtonRenderer());
         tableHebergements.getColumn("Réserver").setCellEditor(new ButtonEditor(new JCheckBox()));
 
-        // --- Déconnexion ---
-        boutonDeconnexion = new JButton("Déconnexion");
-        boutonDeconnexion.setActionCommand("DECONNEXION");
-
-        JPanel panelBas = new JPanel();
-        panelBas.add(boutonDeconnexion);
-
         // --- Layout global ---
-        setLayout(new BorderLayout(10, 10));
-        add(panelRecherche, BorderLayout.NORTH);
+        JPanel panelHaut = new JPanel(new BorderLayout());
+        panelHaut.add(barreNavigation, BorderLayout.NORTH);
+        panelHaut.add(panelRecherche, BorderLayout.SOUTH);
+
+        setLayout(new BorderLayout());
+        add(panelHaut, BorderLayout.NORTH);
         add(scrollPane, BorderLayout.CENTER);
-        add(panelBas, BorderLayout.SOUTH);
     }
 
     public void afficherListeHebergements(ArrayList<Hebergement> hebergements) {
@@ -111,18 +124,28 @@ public class VueAccueil extends JFrame {
         tableHebergements.getColumn("Réserver").setCellEditor(new ButtonEditor(new JCheckBox()));
     }
 
-    public String getLieuRecherche() { return champLieu.getText(); }
+    public String getLieuRecherche() {
+        return champLieu.getText();
+    }
 
-    public int getNbPersonnes() { return (Integer) spinnerPersonnes.getValue(); }
+    public int getNbPersonnes() {
+        return (Integer) spinnerPersonnes.getValue();
+    }
 
-    public String getDateDebut() { return champDateDebut.getText(); }
+    public String getDateDebut() {
+        return champDateDebut.getText();
+    }
 
-    public String getDateFin() { return champDateFin.getText(); }
+    public String getDateFin() {
+        return champDateFin.getText();
+    }
 
     public void ajouterEcouteur(ActionListener listener) {
-        if (this.actionListener == null) {  // S'assurer que l'écouteur n'est ajouté qu'une seule fois
+        if (this.actionListener == null) {
             boutonRecherche.addActionListener(listener);
             boutonDeconnexion.addActionListener(listener);
+            boutonAccueil.addActionListener(listener);
+            boutonMesReservations.addActionListener(listener);
             this.actionListener = listener;
         }
     }
@@ -134,8 +157,6 @@ public class VueAccueil extends JFrame {
     public Hebergement getHebergementSelectionne() {
         return hebergementSelectionne;
     }
-
-
 
     // Renderer pour afficher un bouton dans une cellule
     class ButtonRenderer extends JButton implements javax.swing.table.TableCellRenderer {
@@ -152,7 +173,7 @@ public class VueAccueil extends JFrame {
         }
     }
 
-    // Editor pour détecter le clic sur le bouton
+    // Editor pour gérer le clic sur le bouton dans une cellule
     class ButtonEditor extends DefaultCellEditor {
         private JButton button;
         private String label;

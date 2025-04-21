@@ -1,13 +1,12 @@
 package Controleur;
 
+import Dao.AvisDAOImpl;
 import Dao.HebergementDAOImpl;
 import Dao.ReservationDAOImpl;
 import Dao.PaiementDAOImpl;
-import Modele.Hebergement;
-import Modele.Reservation;
-import Modele.User;
-import Modele.Paiement;
+import Modele.*;
 import Vue.VueAccueil;
+import Vue.VueMesReservations; // <<--- AJOUT
 import Vue.VuePaiement;
 import Vue.VueReservation;
 
@@ -22,6 +21,7 @@ public class Reserver implements ActionListener {
     private PaiementDAOImpl paiementDAO;
     private VueReservation vueReservation;
     private VuePaiement vuePaiement;
+    private AvisDAOImpl avisDAO;
 
     private java.util.Date dateArrivee;
     private java.util.Date dateDepart;
@@ -31,14 +31,16 @@ public class Reserver implements ActionListener {
 
     public Reserver(VueAccueil vueAccueil, HebergementDAOImpl hebergementDAO,
                     ReservationDAOImpl reservationDAO, PaiementDAOImpl paiementDAO,
-                    VueReservation vueReservation) {
+                    VueReservation vueReservation, AvisDAOImpl avisDAO) {
         this.vueAccueil = vueAccueil;
         this.hebergementDAO = hebergementDAO;
         this.reservationDAO = reservationDAO;
         this.paiementDAO = paiementDAO;
         this.vueReservation = vueReservation;
+        this.avisDAO = avisDAO;
 
         this.vueReservation.ajouterEcouteur(this);  // Ajoute l'écouteur pour "Valider réservation"
+        this.vueAccueil.ajouterEcouteur(this);      // <<--- IMPORTANT : écouter aussi les actions de VueAccueil
     }
 
     @Override
@@ -56,11 +58,14 @@ public class Reserver implements ActionListener {
                 vueAccueil.setVisible(true);
                 vueAccueil.afficherMessage("Paiement confirmé. Votre réservation est enregistrée !");
                 break;
+
+            case "NAV_MES_RESERVATIONS": // <<--- NOUVEAU CAS
+                lancerVueMesReservations();
+                break;
         }
     }
 
     private void lancerVuePaiement() {
-        // Récupérer les infos de la réservation
         dateArrivee = vueReservation.getDateArrivee();
         dateDepart = vueReservation.getDateDepart();
         nbAdultes = vueReservation.getNbAdultes();
@@ -71,7 +76,7 @@ public class Reserver implements ActionListener {
         User user = Inscription.getUtilisateurConnecte();
 
         vuePaiement = new VuePaiement(user, hebergement, dateArrivee, dateDepart, prixTotal);
-        vuePaiement.ajouterEcouteur(this); // Pour écouter le bouton "Payer"
+        vuePaiement.ajouterEcouteur(this);
         vueReservation.setVisible(false);
         vuePaiement.setVisible(true);
     }
@@ -80,7 +85,6 @@ public class Reserver implements ActionListener {
         java.sql.Date sqlDateArrivee = new Date(dateArrivee.getTime());
         java.sql.Date sqlDateDepart = new Date(dateDepart.getTime());
 
-        // Création et insertion de la réservation
         Reservation reservation = new Reservation(
                 Inscription.getUtilisateurId(),
                 vueAccueil.getHebergementSelectionne().getId(),
@@ -95,7 +99,6 @@ public class Reserver implements ActionListener {
 
         reservationDAO.ajouter(reservation);
 
-        // Création et insertion du paiement lié
         Paiement paiement = new Paiement(
                 reservation.getReservationId(),
                 prixTotal,
@@ -104,5 +107,11 @@ public class Reserver implements ActionListener {
         );
 
         paiementDAO.ajouter(paiement);
+    }
+
+    // Nouvelle méthode appelée quand on clique sur "Mes Réservations"
+    private void lancerVueMesReservations() {
+        VueMesReservations vueMesReservations = new VueMesReservations(reservationDAO, hebergementDAO, avisDAO);
+        vueMesReservations.setVisible(true);
     }
 }

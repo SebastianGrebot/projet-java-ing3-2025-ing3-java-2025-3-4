@@ -46,10 +46,12 @@ public class Main {
 
         PaiementDAOImpl paiementDAO = new PaiementDAOImpl(dao);
 
-        //  reservation
-        Reserver reserver = new Reserver(vueAccueil, daoHebergement, daoReservation, paiementDAO, vueReservation);
+        AvisDAOImpl avisDAO = new AvisDAOImpl(dao);
 
-        Accueil accueil = new Accueil(vueAccueil, daoHebergement , vueConnexion, reserver, vueReservation, daoReservation, paiementDAO);
+        //  reservation
+        Reserver reserver = new Reserver(vueAccueil, daoHebergement, daoReservation, paiementDAO, vueReservation, avisDAO);
+
+        Accueil accueil = new Accueil(vueAccueil, daoHebergement , vueConnexion, reserver, vueReservation, daoReservation, paiementDAO, avisDAO);
 
         /// accueil admin
         VueAccueilAdmin vueAccueilAdmin = new VueAccueilAdmin();

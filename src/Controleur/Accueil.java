@@ -1,9 +1,7 @@
 package Controleur;
 
-import Dao.HebergementDAOImpl;
-import Dao.PaiementDAO;
-import Dao.PaiementDAOImpl;
-import Dao.ReservationDAOImpl;
+import Dao.*;
+import Modele.Avis;
 import Modele.Hebergement;
 import Modele.Paiement;
 import Modele.Reservation;
@@ -26,6 +24,7 @@ public class Accueil implements ActionListener {
     private VueReservation vueReservation;
     private ReservationDAOImpl reservationDAO;
     private PaiementDAOImpl paiementDAO;
+    private AvisDAOImpl avisDAO;
 
     private Reserver reserver;
 
@@ -33,7 +32,7 @@ public class Accueil implements ActionListener {
     private ArrayList<Hebergement> hebergementsAffiches;
 
     public Accueil(VueAccueil vueAccueil, HebergementDAOImpl hebergementDAO, VueConnexion vueConnexion,
-                   Reserver reserver, VueReservation vueReservation, ReservationDAOImpl reservationDAO, PaiementDAOImpl paiementDAO) {
+                   Reserver reserver, VueReservation vueReservation, ReservationDAOImpl reservationDAO, PaiementDAOImpl paiementDAO, AvisDAOImpl avisDAO) {
         this.vueAccueil = vueAccueil;
         this.hebergementDAO = hebergementDAO;
         this.vueConnexion = vueConnexion;
@@ -41,6 +40,7 @@ public class Accueil implements ActionListener {
         this.reservationDAO = reservationDAO;
         this.reserver = reserver;
         this.paiementDAO = paiementDAO;
+        this.avisDAO = avisDAO;
 
         this.vueAccueil.ajouterEcouteur(this);
         this.vueAccueil.setVisible(false);
@@ -75,7 +75,7 @@ public class Accueil implements ActionListener {
 
             case "RESERVER":
                 vueReservation = new VueReservation(vueAccueil);
-                reserver = new Reserver(vueAccueil, hebergementDAO, reservationDAO,paiementDAO, vueReservation);
+                reserver = new Reserver(vueAccueil, hebergementDAO, reservationDAO,paiementDAO, vueReservation, avisDAO);
                 vueReservation.ajouterEcouteur(reserver);
                 vueReservation.setVisible(true);
                 break;
