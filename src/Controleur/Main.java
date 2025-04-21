@@ -43,10 +43,13 @@ public class Main {
 
         ReservationDAOImpl daoReservation = new ReservationDAOImpl(dao);
         VueReservation vueReservation = new VueReservation(vueAccueil);
-        //  reservation
-        Reserver reserver = new Reserver(vueAccueil, daoHebergement, daoReservation, vueReservation);
 
-        Accueil accueil = new Accueil(vueAccueil, daoHebergement , vueConnexion, reserver, vueReservation, daoReservation);
+        PaiementDAOImpl paiementDAO = new PaiementDAOImpl(dao);
+
+        //  reservation
+        Reserver reserver = new Reserver(vueAccueil, daoHebergement, daoReservation, paiementDAO, vueReservation);
+
+        Accueil accueil = new Accueil(vueAccueil, daoHebergement , vueConnexion, reserver, vueReservation, daoReservation, paiementDAO);
 
         /// accueil admin
         VueAccueilAdmin vueAccueilAdmin = new VueAccueilAdmin();

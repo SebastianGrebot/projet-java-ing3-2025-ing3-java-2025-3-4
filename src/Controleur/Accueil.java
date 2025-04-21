@@ -1,8 +1,11 @@
 package Controleur;
 
 import Dao.HebergementDAOImpl;
+import Dao.PaiementDAO;
+import Dao.PaiementDAOImpl;
 import Dao.ReservationDAOImpl;
 import Modele.Hebergement;
+import Modele.Paiement;
 import Modele.Reservation;
 import Vue.VueAccueil;
 import Vue.VueConnexion;
@@ -22,6 +25,7 @@ public class Accueil implements ActionListener {
     private VueConnexion vueConnexion;
     private VueReservation vueReservation;
     private ReservationDAOImpl reservationDAO;
+    private PaiementDAOImpl paiementDAO;
 
     private Reserver reserver;
 
@@ -29,13 +33,14 @@ public class Accueil implements ActionListener {
     private ArrayList<Hebergement> hebergementsAffiches;
 
     public Accueil(VueAccueil vueAccueil, HebergementDAOImpl hebergementDAO, VueConnexion vueConnexion,
-                   Reserver reserver, VueReservation vueReservation, ReservationDAOImpl reservationDAO) {
+                   Reserver reserver, VueReservation vueReservation, ReservationDAOImpl reservationDAO, PaiementDAOImpl paiementDAO) {
         this.vueAccueil = vueAccueil;
         this.hebergementDAO = hebergementDAO;
         this.vueConnexion = vueConnexion;
         this.vueReservation = vueReservation;
         this.reservationDAO = reservationDAO;
         this.reserver = reserver;
+        this.paiementDAO = paiementDAO;
 
         this.vueAccueil.ajouterEcouteur(this);
         this.vueAccueil.setVisible(false);
@@ -70,7 +75,7 @@ public class Accueil implements ActionListener {
 
             case "RESERVER":
                 vueReservation = new VueReservation(vueAccueil);
-                reserver = new Reserver(vueAccueil, hebergementDAO, reservationDAO, vueReservation);
+                reserver = new Reserver(vueAccueil, hebergementDAO, reservationDAO,paiementDAO, vueReservation);
                 vueReservation.ajouterEcouteur(reserver);
                 vueReservation.setVisible(true);
                 break;

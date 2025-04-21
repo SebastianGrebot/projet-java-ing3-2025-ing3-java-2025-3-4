@@ -2,9 +2,11 @@ package Controleur;
 
 import Dao.HebergementDAOImpl;
 import Dao.ReservationDAOImpl;
+import Dao.PaiementDAOImpl;
 import Modele.Hebergement;
 import Modele.Reservation;
 import Modele.User;
+import Modele.Paiement;
 import Vue.VueAccueil;
 import Vue.VuePaiement;
 import Vue.VueReservation;
@@ -17,6 +19,7 @@ public class Reserver implements ActionListener {
     private VueAccueil vueAccueil;
     private HebergementDAOImpl hebergementDAO;
     private ReservationDAOImpl reservationDAO;
+    private PaiementDAOImpl paiementDAO;
     private VueReservation vueReservation;
     private VuePaiement vuePaiement;
 
@@ -26,10 +29,13 @@ public class Reserver implements ActionListener {
     private int nbEnfants;
     private double prixTotal;
 
-    public Reserver(VueAccueil vueAccueil, HebergementDAOImpl hebergementDAO, ReservationDAOImpl reservationDAO, VueReservation vueReservation) {
+    public Reserver(VueAccueil vueAccueil, HebergementDAOImpl hebergementDAO,
+                    ReservationDAOImpl reservationDAO, PaiementDAOImpl paiementDAO,
+                    VueReservation vueReservation) {
         this.vueAccueil = vueAccueil;
         this.hebergementDAO = hebergementDAO;
         this.reservationDAO = reservationDAO;
+        this.paiementDAO = paiementDAO;
         this.vueReservation = vueReservation;
 
         this.vueReservation.ajouterEcouteur(this);  // Ajoute l'écouteur pour "Valider réservation"
@@ -45,7 +51,7 @@ public class Reserver implements ActionListener {
                 break;
 
             case "PAYER":
-                enregistrerReservation(); // Effectue l’enregistrement en base
+                enregistrerReservation(); // Enregistre réservation ET paiement
                 vuePaiement.setVisible(false);
                 vueAccueil.setVisible(true);
                 vueAccueil.afficherMessage("Paiement confirmé. Votre réservation est enregistrée !");
@@ -74,6 +80,7 @@ public class Reserver implements ActionListener {
         java.sql.Date sqlDateArrivee = new Date(dateArrivee.getTime());
         java.sql.Date sqlDateDepart = new Date(dateDepart.getTime());
 
+        // Création et insertion de la réservation
         Reservation reservation = new Reservation(
                 Inscription.getUtilisateurId(),
                 vueAccueil.getHebergementSelectionne().getId(),
@@ -87,5 +94,15 @@ public class Reserver implements ActionListener {
         );
 
         reservationDAO.ajouter(reservation);
+
+        // Création et insertion du paiement lié
+        Paiement paiement = new Paiement(
+                reservation.getReservationId(),
+                prixTotal,
+                new Date(System.currentTimeMillis()),
+                "termine"
+        );
+
+        paiementDAO.ajouter(paiement);
     }
 }
