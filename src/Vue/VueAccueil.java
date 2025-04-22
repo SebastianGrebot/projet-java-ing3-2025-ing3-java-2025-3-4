@@ -1,5 +1,6 @@
 package Vue;
 
+import Dao.HebergementDAOImpl;
 import Modele.Hebergement;
 
 import javax.swing.*;
@@ -28,9 +29,17 @@ public class VueAccueil extends JFrame {
     private ArrayList<Hebergement> hebergementsAffiches;
     private Hebergement hebergementSelectionne;
 
-    public VueAccueil() {
+    private HebergementDAOImpl hebergementDAO;
+
+    // Nouveau constructeur avec DAO
+    public VueAccueil(HebergementDAOImpl hebergementDAO) {
+        this.hebergementDAO = hebergementDAO;
+        initialiserUI();
+    }
+
+    private void initialiserUI() {
         setTitle("Accueil - Rechercher un Hébergement");
-        setSize(1000, 600);
+        setSize(1100, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -47,7 +56,7 @@ public class VueAccueil extends JFrame {
 
         barreNavigation.add(boutonAccueil);
         barreNavigation.add(boutonMesReservations);
-        barreNavigation.add(Box.createHorizontalStrut(20)); // espacement
+        barreNavigation.add(Box.createHorizontalStrut(20));
         barreNavigation.add(boutonDeconnexion);
 
         // --- Barre de recherche ---
@@ -65,7 +74,7 @@ public class VueAccueil extends JFrame {
         panelRecherche.add(new JLabel("Personnes :"));
         panelRecherche.add(new JLabel("Date d'arrivée :"));
         panelRecherche.add(new JLabel("Date de départ :"));
-        panelRecherche.add(new JLabel("")); // vide
+        panelRecherche.add(new JLabel(""));
 
         panelRecherche.add(champLieu);
         panelRecherche.add(spinnerPersonnes);
@@ -75,15 +84,15 @@ public class VueAccueil extends JFrame {
 
         // --- Tableau des hébergements ---
         tableModel = new DefaultTableModel(
-                new Object[]{"Nom", "Ville", "Pays", "Catégorie", "Description", "Prix (€)", "Réserver"}, 0) {
+                new Object[]{"Nom", "Ville", "Pays", "Catégorie", "Description", "Prix (€)", "Note Moyenne", "Réserver"}, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return column == 6; // Seule la colonne bouton est éditable
+                return column == 7;
             }
 
             @Override
             public Class<?> getColumnClass(int columnIndex) {
-                return columnIndex == 6 ? JButton.class : String.class;
+                return columnIndex == 7 ? JButton.class : String.class;
             }
         };
 
@@ -109,6 +118,9 @@ public class VueAccueil extends JFrame {
         tableModel.setRowCount(0);
 
         for (Hebergement h : hebergements) {
+            double moyenne = hebergementDAO.calculerMoyenneNotes(h.getId());
+            String noteStr = (moyenne == 0) ? "Aucune note" : String.format("%.1f / 5", moyenne);
+
             tableModel.addRow(new Object[]{
                     h.getNom(),
                     h.getVille(),
@@ -116,6 +128,7 @@ public class VueAccueil extends JFrame {
                     h.getCategorie(),
                     h.getDescription(),
                     h.getPrixParNuit() + " €",
+                    noteStr,
                     "Réserver"
             });
         }
@@ -158,7 +171,7 @@ public class VueAccueil extends JFrame {
         return hebergementSelectionne;
     }
 
-    // Renderer pour afficher un bouton dans une cellule
+    // Renderer pour bouton
     class ButtonRenderer extends JButton implements javax.swing.table.TableCellRenderer {
         public ButtonRenderer() {
             setOpaque(true);
@@ -173,7 +186,7 @@ public class VueAccueil extends JFrame {
         }
     }
 
-    // Editor pour gérer le clic sur le bouton dans une cellule
+    // Editor pour bouton
     class ButtonEditor extends DefaultCellEditor {
         private JButton button;
         private String label;

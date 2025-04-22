@@ -1,5 +1,6 @@
 package Dao;
 
+import Modele.Avis;
 import Modele.Hebergement;
 import java.sql.*;
 import java.util.ArrayList;
@@ -136,4 +137,48 @@ public class HebergementDAOImpl implements HebergementDAO {
             System.out.println("Suppression impossible");
         }
     }
+
+
+    public ArrayList<Avis> getAvisParHebergement(int hebergementId) {
+        ArrayList<Avis> avisList = new ArrayList<>();
+
+        try {
+            Connection connexion = daoFactory.getConnection();
+            PreparedStatement ps = connexion.prepareStatement(
+                    "SELECT * FROM avis WHERE hebergement_id = ?"
+            );
+            ps.setInt(1, hebergementId);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Avis avis = new Avis(
+                        rs.getInt("avis_id"),
+                        rs.getInt("utilisateur_id"),
+                        rs.getInt("hebergement_id"),
+                        rs.getInt("note"),
+                        rs.getString("commentaire"),
+                        rs.getDate("date_creation")
+                );
+                avisList.add(avis);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Erreur lors de la récupération des avis.");
+        }
+
+        return avisList;
+    }
+
+    public double calculerMoyenneNotes(int hebergementId) {
+        ArrayList<Avis> avisList = getAvisParHebergement(hebergementId);
+        if (avisList.isEmpty()) {
+            return 0;
+        }
+        int totalNotes = 0;
+        for (Avis avis : avisList) {
+            totalNotes += avis.getNote();
+        }
+        return (double) totalNotes / avisList.size();
+    }
+
 }

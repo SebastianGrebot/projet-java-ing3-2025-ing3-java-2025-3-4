@@ -39,7 +39,7 @@ public class Main {
 
 
         ///  accueil client
-        VueAccueil vueAccueil = new VueAccueil();
+        VueAccueil vueAccueil = new VueAccueil(daoHebergement);
 
         ReservationDAOImpl daoReservation = new ReservationDAOImpl(dao);
         VueReservation vueReservation = new VueReservation(vueAccueil);

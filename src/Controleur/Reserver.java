@@ -59,8 +59,12 @@ public class Reserver implements ActionListener {
                 vueAccueil.afficherMessage("Paiement confirmé. Votre réservation est enregistrée !");
                 break;
 
-            case "NAV_MES_RESERVATIONS": // <<--- NOUVEAU CAS
+            case "NAV_MES_RESERVATIONS":
                 lancerVueMesReservations();
+                break;
+
+            case "NAV_ACCUEIL":
+                vueAccueil.setVisible(true);
                 break;
         }
     }
