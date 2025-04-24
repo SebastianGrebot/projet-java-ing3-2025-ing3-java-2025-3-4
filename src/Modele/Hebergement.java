@@ -8,9 +8,10 @@ public class Hebergement {
     private String ville;
     private String pays;
     private double prixParNuit;
-    private String categorie; // <- anciennement 'type'
+    private String categorie;
+    private String photo; // <-- nouveau champ
 
-    public Hebergement(int id, String nom, String description, String adresse, String ville, String pays, double prixParNuit, String categorie) {
+    public Hebergement(int id, String nom, String description, String adresse, String ville, String pays, double prixParNuit, String categorie, String photo) {
         this.id = id;
         this.nom = nom;
         this.description = description;
@@ -19,6 +20,7 @@ public class Hebergement {
         this.pays = pays;
         this.prixParNuit = prixParNuit;
         this.categorie = categorie;
+        this.photo = photo;
     }
 
     public int getId() { return id; }
@@ -29,6 +31,7 @@ public class Hebergement {
     public String getPays() { return pays; }
     public double getPrixParNuit() { return prixParNuit; }
     public String getCategorie() { return categorie; }
+    public String getPhoto() { return photo; }
 
     public void setNom(String nom) { this.nom = nom; }
     public void setDescription(String description) { this.description = description; }
@@ -37,4 +40,5 @@ public class Hebergement {
     public void setPays(String pays) { this.pays = pays; }
     public void setPrixParNuit(double prixParNuit) { this.prixParNuit = prixParNuit; }
     public void setCategorie(String categorie) { this.categorie = categorie; }
+    public void setPhoto(String photo) { this.photo = photo; }
 }

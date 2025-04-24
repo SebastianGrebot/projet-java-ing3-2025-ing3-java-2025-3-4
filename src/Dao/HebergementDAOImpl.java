@@ -30,7 +30,8 @@ public class HebergementDAOImpl implements HebergementDAO {
                         resultats.getString("ville"),
                         resultats.getString("pays"),
                         resultats.getDouble("prix_par_nuit"),
-                        resultats.getString("categorie")
+                        resultats.getString("categorie"),
+                        resultats.getString("photo") // Nouveau champ ajouté
                 );
                 listeHebergements.add(h);
             }
@@ -48,7 +49,7 @@ public class HebergementDAOImpl implements HebergementDAO {
             Connection connexion = daoFactory.getConnection();
 
             PreparedStatement ps = connexion.prepareStatement(
-                    "INSERT INTO Hebergements (nom, description, adresse, ville, pays, categorie, prix_par_nuit) VALUES (?, ?, ?, ?, ?, ?, ?)"
+                    "INSERT INTO Hebergements (nom, description, adresse, ville, pays, categorie, prix_par_nuit, photo) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
             );
             ps.setString(1, h.getNom());
             ps.setString(2, h.getDescription());
@@ -57,6 +58,7 @@ public class HebergementDAOImpl implements HebergementDAO {
             ps.setString(5, h.getPays());
             ps.setString(6, h.getCategorie());
             ps.setDouble(7, h.getPrixParNuit());
+            ps.setString(8, h.getPhoto()); // Ajout du champ photo
 
             ps.executeUpdate();
         } catch (SQLException e) {
@@ -84,7 +86,8 @@ public class HebergementDAOImpl implements HebergementDAO {
                         resultats.getString("ville"),
                         resultats.getString("pays"),
                         resultats.getDouble("prix_par_nuit"),
-                        resultats.getString("categorie")
+                        resultats.getString("categorie"),
+                        resultats.getString("photo") // Ajout du champ photo
                 );
             }
         } catch (SQLException e) {
@@ -101,7 +104,7 @@ public class HebergementDAOImpl implements HebergementDAO {
             Connection connexion = daoFactory.getConnection();
 
             PreparedStatement ps = connexion.prepareStatement(
-                    "UPDATE Hebergements SET nom = ?, description = ?, adresse = ?, ville = ?, pays = ?, categorie = ?, prix_par_nuit = ? WHERE hebergement_id = ?"
+                    "UPDATE Hebergements SET nom = ?, description = ?, adresse = ?, ville = ?, pays = ?, categorie = ?, prix_par_nuit = ?, photo = ? WHERE hebergement_id = ?"
             );
             ps.setString(1, h.getNom());
             ps.setString(2, h.getDescription());
@@ -110,7 +113,8 @@ public class HebergementDAOImpl implements HebergementDAO {
             ps.setString(5, h.getPays());
             ps.setString(6, h.getCategorie());
             ps.setDouble(7, h.getPrixParNuit());
-            ps.setInt(8, h.getId());
+            ps.setString(8, h.getPhoto()); // Ajout du champ photo
+            ps.setInt(9, h.getId());
 
             ps.executeUpdate();
         } catch (SQLException e) {
@@ -137,7 +141,6 @@ public class HebergementDAOImpl implements HebergementDAO {
             System.out.println("Suppression impossible");
         }
     }
-
 
     public ArrayList<Avis> getAvisParHebergement(int hebergementId) {
         ArrayList<Avis> avisList = new ArrayList<>();
@@ -180,5 +183,4 @@ public class HebergementDAOImpl implements HebergementDAO {
         }
         return (double) totalNotes / avisList.size();
     }
-
 }

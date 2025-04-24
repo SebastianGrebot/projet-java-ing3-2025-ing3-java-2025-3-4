@@ -15,13 +15,10 @@ public class AccueilAdmin implements ActionListener {
     public AccueilAdmin(VueAccueilAdmin vue, HebergementDAO hebergementDAO) {
         this.vue = vue;
         this.hebergementDAO = hebergementDAO;
-
-        // Attacher les listeners ici, mais ne pas afficher tout de suite
         this.vue.ajouterEcouteur(this);
     }
 
     public void afficherAccueilAdmin() {
-        // Tu peux ajouter d'autres logiques d'initialisation ici si besoin
         vue.setVisible(true);
     }
 
@@ -43,9 +40,9 @@ public class AccueilAdmin implements ActionListener {
     private void ajouterHebergement() {
         if (vue.getNom().isEmpty() || vue.getAdresse().isEmpty() || vue.getVille().isEmpty() ||
                 vue.getPays().isEmpty() || vue.getCategorie().isEmpty() || vue.getPrix().isEmpty() ||
-                vue.getDescription().isEmpty()) {
+                vue.getDescription().isEmpty() || vue.getPhoto().isEmpty()) {
 
-            vue.afficherMessage("Veuillez remplir tous les champs !");
+            vue.afficherMessage("Veuillez remplir tous les champs, y compris la photo !");
             return;
         }
 
@@ -57,8 +54,9 @@ public class AccueilAdmin implements ActionListener {
             String categorie = vue.getCategorie();
             double prix = Double.parseDouble(vue.getPrix());
             String description = vue.getDescription();
+            String photo = vue.getPhoto();  // <- récupération du chemin vers l'image
 
-            Hebergement h = new Hebergement(0, nom, description, adresse, ville, pays, prix, categorie);
+            Hebergement h = new Hebergement(0, nom, description, adresse, ville, pays, prix, categorie, photo);
             hebergementDAO.ajouter(h);
 
             vue.afficherMessage("Hébergement ajouté avec succès !");

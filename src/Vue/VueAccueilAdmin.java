@@ -3,6 +3,7 @@ package Vue;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.io.File;
 
 public class VueAccueilAdmin extends JFrame {
 
@@ -10,19 +11,22 @@ public class VueAccueilAdmin extends JFrame {
     private JTextField champAdresse;
     private JTextField champVille;
     private JTextField champPays;
-    private JComboBox<String> comboCategorie; // Remplacé ici
+    private JComboBox<String> comboCategorie;
     private JTextField champPrix;
     private JTextArea champDescription;
+    private JTextField champPhoto;
+    private JButton boutonParcourir;
+
     private JButton boutonAjouter;
     private JButton boutonDeconnexion;
 
     public VueAccueilAdmin() {
         setTitle("Accueil Admin - Ajouter un Hébergement");
-        setSize(600, 500);
+        setSize(650, 550);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        JPanel panelFormulaire = new JPanel(new GridLayout(8, 2, 10, 10));
+        JPanel panelFormulaire = new JPanel(new GridLayout(9, 2, 10, 10));
         panelFormulaire.setBorder(BorderFactory.createTitledBorder("Formulaire d'ajout"));
 
         champNom = new JTextField();
@@ -30,8 +34,7 @@ public class VueAccueilAdmin extends JFrame {
         champVille = new JTextField();
         champPays = new JTextField();
 
-        // Menu déroulant pour la catégorie
-        String[] categories = {"Appartement", "Hôtel", "Maison", "Camping", "Auberge"};
+        String[] categories = {"Appartement", "Hôtel", "Villa", "Camping", "Resort"};
         comboCategorie = new JComboBox<>(categories);
 
         champPrix = new JTextField();
@@ -39,6 +42,14 @@ public class VueAccueilAdmin extends JFrame {
         champDescription.setLineWrap(true);
         champDescription.setWrapStyleWord(true);
         JScrollPane scrollDescription = new JScrollPane(champDescription);
+
+        champPhoto = new JTextField();
+        boutonParcourir = new JButton("Parcourir...");
+        boutonParcourir.addActionListener(e -> choisirFichierPhoto());
+
+        JPanel panelPhoto = new JPanel(new BorderLayout(5, 0));
+        panelPhoto.add(champPhoto, BorderLayout.CENTER);
+        panelPhoto.add(boutonParcourir, BorderLayout.EAST);
 
         boutonAjouter = new JButton("Ajouter");
         boutonAjouter.setActionCommand("AJOUTER_HEBERGEMENT");
@@ -60,6 +71,8 @@ public class VueAccueilAdmin extends JFrame {
         panelFormulaire.add(champPrix);
         panelFormulaire.add(new JLabel("Description :"));
         panelFormulaire.add(scrollDescription);
+        panelFormulaire.add(new JLabel("Photo (chemin) :"));
+        panelFormulaire.add(panelPhoto);
         panelFormulaire.add(new JLabel(""));
         panelFormulaire.add(boutonAjouter);
 
@@ -71,14 +84,25 @@ public class VueAccueilAdmin extends JFrame {
         add(panelBas, BorderLayout.SOUTH);
     }
 
+    private void choisirFichierPhoto() {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
+        int result = fileChooser.showOpenDialog(this);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File fichier = fileChooser.getSelectedFile();
+            champPhoto.setText(fichier.getPath());
+        }
+    }
+
     // Getters
     public String getNom() { return champNom.getText(); }
     public String getAdresse() { return champAdresse.getText(); }
     public String getVille() { return champVille.getText(); }
     public String getPays() { return champPays.getText(); }
-    public String getCategorie() { return (String) comboCategorie.getSelectedItem(); } // MAJ ICI
+    public String getCategorie() { return (String) comboCategorie.getSelectedItem(); }
     public String getPrix() { return champPrix.getText(); }
     public String getDescription() { return champDescription.getText(); }
+    public String getPhoto() { return champPhoto.getText(); }
 
     public void ajouterEcouteur(ActionListener listener) {
         boutonAjouter.addActionListener(listener);
@@ -94,8 +118,9 @@ public class VueAccueilAdmin extends JFrame {
         champAdresse.setText("");
         champVille.setText("");
         champPays.setText("");
-        comboCategorie.setSelectedIndex(0); // MAJ ICI
+        comboCategorie.setSelectedIndex(0);
         champPrix.setText("");
         champDescription.setText("");
+        champPhoto.setText("");
     }
 }

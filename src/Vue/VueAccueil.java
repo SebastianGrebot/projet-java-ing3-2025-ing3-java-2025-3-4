@@ -31,7 +31,6 @@ public class VueAccueil extends JFrame {
 
     private HebergementDAOImpl hebergementDAO;
 
-    // Nouveau constructeur avec DAO
     public VueAccueil(HebergementDAOImpl hebergementDAO) {
         this.hebergementDAO = hebergementDAO;
         initialiserUI();
@@ -39,7 +38,7 @@ public class VueAccueil extends JFrame {
 
     private void initialiserUI() {
         setTitle("Accueil - Rechercher un Hébergement");
-        setSize(1100, 600);
+        setSize(1200, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -84,20 +83,23 @@ public class VueAccueil extends JFrame {
 
         // --- Tableau des hébergements ---
         tableModel = new DefaultTableModel(
-                new Object[]{"Nom", "Ville", "Pays", "Catégorie", "Description", "Prix (€)", "Note Moyenne", "Réserver"}, 0) {
+                new Object[]{"Photo", "Nom", "Ville", "Pays", "Catégorie", "Description", "Prix (€)", "Note Moyenne", "Réserver"}, 0) {
+
             @Override
             public boolean isCellEditable(int row, int column) {
-                return column == 7;
+                return column == 9;
             }
 
             @Override
             public Class<?> getColumnClass(int columnIndex) {
-                return columnIndex == 7 ? JButton.class : String.class;
+                if (columnIndex == 0) return ImageIcon.class;
+                if (columnIndex == 9) return JButton.class;
+                return String.class;
             }
         };
 
         tableHebergements = new JTable(tableModel);
-        tableHebergements.setRowHeight(40);
+        tableHebergements.setRowHeight(80);
         JScrollPane scrollPane = new JScrollPane(tableHebergements);
 
         tableHebergements.getColumn("Réserver").setCellRenderer(new ButtonRenderer());
@@ -121,7 +123,19 @@ public class VueAccueil extends JFrame {
             double moyenne = hebergementDAO.calculerMoyenneNotes(h.getId());
             String noteStr = (moyenne == 0) ? "Aucune note" : String.format("%.1f / 5", moyenne);
 
+            ImageIcon image = null;
+            try {
+                if (h.getPhoto() != null && !h.getPhoto().isEmpty()) {
+                    ImageIcon icon = new ImageIcon(h.getPhoto());
+                    Image scaled = icon.getImage().getScaledInstance(100, 75, Image.SCALE_SMOOTH);
+                    image = new ImageIcon(scaled);
+                }
+            } catch (Exception e) {
+                System.out.println("Erreur de chargement de l'image pour : " + h.getNom());
+            }
+
             tableModel.addRow(new Object[]{
+                    image,
                     h.getNom(),
                     h.getVille(),
                     h.getPays(),
@@ -171,7 +185,6 @@ public class VueAccueil extends JFrame {
         return hebergementSelectionne;
     }
 
-    // Renderer pour bouton
     class ButtonRenderer extends JButton implements javax.swing.table.TableCellRenderer {
         public ButtonRenderer() {
             setOpaque(true);
@@ -186,7 +199,6 @@ public class VueAccueil extends JFrame {
         }
     }
 
-    // Editor pour bouton
     class ButtonEditor extends DefaultCellEditor {
         private JButton button;
         private String label;
