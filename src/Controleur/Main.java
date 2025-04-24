@@ -53,10 +53,27 @@ public class Main {
         Accueil accueil = new Accueil(vueAccueil, daoHebergement , vueConnexion, reserver, vueReservation, daoReservation, paiementDAO, avisDAO, daoUser);
 
         /// accueil admin
-        VueAccueilAdmin vueAccueilAdmin = new VueAccueilAdmin();
-        AccueilAdmin accueilAdmin = new AccueilAdmin(vueAccueilAdmin, daoHebergement);
 
-        new Inscription(daoUser, vueInscription, vueConnexion, vueAdmin, accueil, accueilAdmin);
+        VueAccueilAdmin vueAccueilAdmin = new VueAccueilAdmin();
+        OptionDAOImpl daoOption = new OptionDAOImpl(dao);
+        VueAjouterOption vueAjouterOption = new VueAjouterOption();
+        VueModifierSupprimerOption vueModifierSupprimerOption = new VueModifierSupprimerOption();
+        VueAssocierOptionsHebergement vueAssocierOptionsHebergement = new VueAssocierOptionsHebergement();
+        VueAjoutHebergement vueAjoutHebergement = new VueAjoutHebergement();
+
+        AccueilAdmin controleurAdmin = new AccueilAdmin(
+                vueAccueilAdmin,
+                vueAjoutHebergement,
+                vueAjouterOption,
+                vueModifierSupprimerOption,
+                vueAssocierOptionsHebergement,
+                daoOption,
+                daoHebergement
+        );
+
+        //AccueilAdmin accueilAdmin = new AccueilAdmin(vueAccueilAdmin, daoHebergement);
+
+        new Inscription(daoUser, vueInscription, vueConnexion, vueAdmin, accueil, controleurAdmin);
 
 
 
