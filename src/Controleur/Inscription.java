@@ -8,6 +8,7 @@ import Vue.VueInscription;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Objects;
 
 public class Inscription implements ActionListener {
 
@@ -67,7 +68,7 @@ public class Inscription implements ActionListener {
                     User userI = new User(prenom, nom, email, mdp, "nouveau");
                     userDAO.ajouter(userI);
 
-                    User user = userDAO.chercher(email, mdp, "nouveau");
+                    User user = userDAO.chercher(email, mdp);
 
                     utilisateurConnecte = user; // On garde l'utilisateur connecté
 
@@ -88,7 +89,7 @@ public class Inscription implements ActionListener {
                 if (emailC.isEmpty() || mdpC.isEmpty()) {
                     vueConnexion.afficherMessage("Tous les champs doivent être remplis.");
                 } else {
-                    User user = userDAO.chercher(emailC, mdpC, "nouveau");
+                    User user = userDAO.chercher(emailC, mdpC);
 
                     if (user != null) {
                         utilisateurConnecte = user; // Connexion réussie = on stocke l'utilisateur
@@ -118,16 +119,18 @@ public class Inscription implements ActionListener {
                 if (emailA.isEmpty() || mdpA.isEmpty()) {
                     vueAdmin.afficherMessage("Tous les champs doivent être remplis.");
                 } else {
-                    User user = userDAO.chercher(emailA, mdpA, "admin");
+                    User user = userDAO.chercher(emailA, mdpA);
 
-                    if (user != null) {
-                        utilisateurConnecte = user; // Connexion admin = aussi stockée
+                    if(Objects.equals(user.getTypeUtilisateur(), "admin")){
+                        utilisateurConnecte = user;
 
                         vueConnexion.afficherMessage("Heureux de vous revoir " + user.getNom());
                         accueilAdmin.afficherAccueilAdmin();
+
                     } else {
-                        vueConnexion.afficherMessage("Email ou mot de passe incorrect ou vous n'avez pas les droits");
+                        vueConnexion.afficherMessage("L'utilisateur n'est pas administrateur");
                     }
+
                 }
                 break;
 

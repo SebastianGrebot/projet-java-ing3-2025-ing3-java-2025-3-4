@@ -94,17 +94,16 @@ public class UserDAOImpl implements UserDAO {
         return user;
     }
 
-    public User chercher(String email, String motDePasse, String typeUtilisateur) {
+    public User chercher(String email, String motDePasse) {
         User user = null;
 
         try {
             Connection connexion = daoFactory.getConnection();
             PreparedStatement pstmt = connexion.prepareStatement(
-                    "SELECT * FROM Utilisateurs WHERE email = ? AND mot_de_passe = ? AND type_utilisateur = ?"
+                    "SELECT * FROM Utilisateurs WHERE email = ? AND mot_de_passe = ?"
             );
             pstmt.setString(1, email.trim());
             pstmt.setString(2, motDePasse.trim());
-            pstmt.setString(3, typeUtilisateur.trim());
 
             ResultSet resultats = pstmt.executeQuery();
 
@@ -118,13 +117,13 @@ public class UserDAOImpl implements UserDAO {
                         resultats.getString("type_utilisateur"),
                         resultats.getTimestamp("date_creation")
                 );
-                System.out.println("Utilisateur " + typeUtilisateur + " trouvé : " + user.getEmail());
+                System.out.println("Utilisateur trouvé : " + user.getEmail());
             } else {
-                System.out.println("Aucun utilisateur " + typeUtilisateur + " trouvé avec ces identifiants.");
+                System.out.println("Aucun utilisateur trouvé avec ces identifiants.");
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            System.out.println("Erreur SQL lors de la recherche de l'utilisateur " + typeUtilisateur + ".");
+            System.out.println("Erreur SQL lors de la recherche de l'utilisateur .");
         }
 
         return user;
