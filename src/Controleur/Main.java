@@ -17,7 +17,6 @@ public class Main {
         UserDAOImpl daoUser = new UserDAOImpl(dao);
         VueUser vueUser = new VueUser();
 
-
         // Récupérer la liste des produits de la base de données avec l'objet prodao de la classe ProduitDAOImpl
         ArrayList<Hebergement> hebergements = daoHebergement.getAll();
 
@@ -49,9 +48,9 @@ public class Main {
         AvisDAOImpl avisDAO = new AvisDAOImpl(dao);
 
         //  reservation
-        Reserver reserver = new Reserver(vueAccueil, daoHebergement, daoReservation, paiementDAO, vueReservation, avisDAO);
+        Reserver reserver = new Reserver(vueAccueil, daoHebergement, daoReservation, paiementDAO, vueReservation, avisDAO, daoUser);
 
-        Accueil accueil = new Accueil(vueAccueil, daoHebergement , vueConnexion, reserver, vueReservation, daoReservation, paiementDAO, avisDAO);
+        Accueil accueil = new Accueil(vueAccueil, daoHebergement , vueConnexion, reserver, vueReservation, daoReservation, paiementDAO, avisDAO, daoUser);
 
         /// accueil admin
         VueAccueilAdmin vueAccueilAdmin = new VueAccueilAdmin();

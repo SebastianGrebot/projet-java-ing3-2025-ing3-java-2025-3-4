@@ -33,12 +33,8 @@ public class VueAccueil extends JFrame {
 
     public VueAccueil(HebergementDAOImpl hebergementDAO) {
         this.hebergementDAO = hebergementDAO;
-        initialiserUI();
-    }
-
-    private void initialiserUI() {
         setTitle("Accueil - Rechercher un Hébergement");
-        setSize(1200, 600);
+        setSize(1300, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -83,7 +79,7 @@ public class VueAccueil extends JFrame {
 
         // --- Tableau des hébergements ---
         tableModel = new DefaultTableModel(
-                new Object[]{"Photo", "Nom", "Ville", "Pays", "Catégorie", "Description", "Prix (€)", "Note Moyenne", "Réserver"}, 0) {
+                new Object[]{"Photo", "Nom", "Ville", "Pays", "Catégorie", "Description", "Prix (€)", "Note Moyenne", "Étoiles", "Réserver"}, 0) {
 
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -121,6 +117,12 @@ public class VueAccueil extends JFrame {
 
         for (Hebergement h : hebergements) {
             double moyenne = hebergementDAO.calculerMoyenneNotes(h.getId());
+            int etoiles = (int) Math.round(moyenne);
+
+            h.setNoteMoyenne(moyenne);
+            h.setEtoiles(etoiles);
+            hebergementDAO.mettreAJourNoteEtEtoiles(h.getId(), moyenne, etoiles);
+
             String noteStr = (moyenne == 0) ? "Aucune note" : String.format("%.1f / 5", moyenne);
 
             ImageIcon image = null;
@@ -143,12 +145,21 @@ public class VueAccueil extends JFrame {
                     h.getDescription(),
                     h.getPrixParNuit() + " €",
                     noteStr,
+                    genererEtoiles(h.getEtoiles()),
                     "Réserver"
             });
         }
 
         tableHebergements.getColumn("Réserver").setCellRenderer(new ButtonRenderer());
         tableHebergements.getColumn("Réserver").setCellEditor(new ButtonEditor(new JCheckBox()));
+    }
+
+    private String genererEtoiles(int etoilesPleines) {
+        StringBuilder etoiles = new StringBuilder();
+        for (int i = 0; i < 5; i++) {
+            etoiles.append(i < etoilesPleines ? "★" : "☆");
+        }
+        return etoiles.toString();
     }
 
     public String getLieuRecherche() {
@@ -208,17 +219,13 @@ public class VueAccueil extends JFrame {
             super(checkBox);
             button = new JButton();
             button.setOpaque(true);
-
-            button.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    fireEditingStopped();
-                    int row = tableHebergements.getSelectedRow();
-                    if (row >= 0 && row < hebergementsAffiches.size()) {
-                        hebergementSelectionne = hebergementsAffiches.get(row);
-                        if (actionListener != null) {
-                            actionListener.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "RESERVER"));
-                        }
+            button.addActionListener(e -> {
+                fireEditingStopped();
+                int row = tableHebergements.getSelectedRow();
+                if (row >= 0 && row < hebergementsAffiches.size()) {
+                    hebergementSelectionne = hebergementsAffiches.get(row);
+                    if (actionListener != null) {
+                        actionListener.actionPerformed(new ActionEvent(VueAccueil.this, ActionEvent.ACTION_PERFORMED, "RESERVER"));
                     }
                 }
             });

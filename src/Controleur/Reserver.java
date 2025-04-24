@@ -1,12 +1,9 @@
 package Controleur;
 
-import Dao.AvisDAOImpl;
-import Dao.HebergementDAOImpl;
-import Dao.ReservationDAOImpl;
-import Dao.PaiementDAOImpl;
+import Dao.*;
 import Modele.*;
 import Vue.VueAccueil;
-import Vue.VueMesReservations; // <<--- AJOUT
+import Vue.VueMesReservations;
 import Vue.VuePaiement;
 import Vue.VueReservation;
 
@@ -22,6 +19,7 @@ public class Reserver implements ActionListener {
     private VueReservation vueReservation;
     private VuePaiement vuePaiement;
     private AvisDAOImpl avisDAO;
+    private UserDAOImpl userDAO;
 
     private java.util.Date dateArrivee;
     private java.util.Date dateDepart;
@@ -31,16 +29,18 @@ public class Reserver implements ActionListener {
 
     public Reserver(VueAccueil vueAccueil, HebergementDAOImpl hebergementDAO,
                     ReservationDAOImpl reservationDAO, PaiementDAOImpl paiementDAO,
-                    VueReservation vueReservation, AvisDAOImpl avisDAO) {
+                    VueReservation vueReservation, AvisDAOImpl avisDAO, UserDAOImpl userDAO) {
         this.vueAccueil = vueAccueil;
         this.hebergementDAO = hebergementDAO;
         this.reservationDAO = reservationDAO;
         this.paiementDAO = paiementDAO;
         this.vueReservation = vueReservation;
         this.avisDAO = avisDAO;
+        this.userDAO = userDAO;
 
         this.vueReservation.ajouterEcouteur(this);  // Ajoute l'écouteur pour "Valider réservation"
-        this.vueAccueil.ajouterEcouteur(this);      // <<--- IMPORTANT : écouter aussi les actions de VueAccueil
+        //this.vueAccueil.ajouterEcouteur(this);      // <<--- IMPORTANT : écouter aussi les actions de VueAccueil
+
     }
 
     @Override
@@ -57,14 +57,10 @@ public class Reserver implements ActionListener {
                 vuePaiement.setVisible(false);
                 vueAccueil.setVisible(true);
                 vueAccueil.afficherMessage("Paiement confirmé. Votre réservation est enregistrée !");
-                break;
+                if (Inscription.getUtilisateurConnecte().getTypeUtilisateur().equals("nouveau")) {
+                    userDAO.updateTypeUtilisateur(Inscription.getUtilisateurId(), "ancien");
+                }
 
-            case "NAV_MES_RESERVATIONS":
-                lancerVueMesReservations();
-                break;
-
-            case "NAV_ACCUEIL":
-                vueAccueil.setVisible(true);
                 break;
         }
     }
@@ -113,7 +109,7 @@ public class Reserver implements ActionListener {
         paiementDAO.ajouter(paiement);
     }
 
-    // Nouvelle méthode appelée quand on clique sur "Mes Réservations"
+
     private void lancerVueMesReservations() {
         VueMesReservations vueMesReservations = new VueMesReservations(reservationDAO, hebergementDAO, avisDAO);
         vueMesReservations.setVisible(true);

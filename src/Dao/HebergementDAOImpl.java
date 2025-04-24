@@ -183,4 +183,18 @@ public class HebergementDAOImpl implements HebergementDAO {
         }
         return (double) totalNotes / avisList.size();
     }
+
+    public void mettreAJourNoteEtEtoiles(int hebergementId, double noteMoyenne, int etoiles) {
+        String sql = "UPDATE hebergements SET note_moyenne = ?, etoiles = ? WHERE hebergement_id = ?";
+        try (Connection conn = daoFactory.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setDouble(1, noteMoyenne);
+            stmt.setInt(2, etoiles);
+            stmt.setInt(3, hebergementId);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
 }

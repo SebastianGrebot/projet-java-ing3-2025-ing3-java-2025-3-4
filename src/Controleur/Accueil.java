@@ -1,12 +1,10 @@
 package Controleur;
 
 import Dao.*;
-import Modele.Avis;
-import Modele.Hebergement;
-import Modele.Paiement;
-import Modele.Reservation;
+import Modele.*;
 import Vue.VueAccueil;
 import Vue.VueConnexion;
+import Vue.VueMesReservations;
 import Vue.VueReservation;
 
 import java.awt.event.ActionEvent;
@@ -25,6 +23,8 @@ public class Accueil implements ActionListener {
     private ReservationDAOImpl reservationDAO;
     private PaiementDAOImpl paiementDAO;
     private AvisDAOImpl avisDAO;
+    private UserDAOImpl userDAO;
+
 
     private Reserver reserver;
 
@@ -32,7 +32,7 @@ public class Accueil implements ActionListener {
     private ArrayList<Hebergement> hebergementsAffiches;
 
     public Accueil(VueAccueil vueAccueil, HebergementDAOImpl hebergementDAO, VueConnexion vueConnexion,
-                   Reserver reserver, VueReservation vueReservation, ReservationDAOImpl reservationDAO, PaiementDAOImpl paiementDAO, AvisDAOImpl avisDAO) {
+                   Reserver reserver, VueReservation vueReservation, ReservationDAOImpl reservationDAO, PaiementDAOImpl paiementDAO, AvisDAOImpl avisDA0, UserDAOImpl userDAO) {
         this.vueAccueil = vueAccueil;
         this.hebergementDAO = hebergementDAO;
         this.vueConnexion = vueConnexion;
@@ -41,6 +41,7 @@ public class Accueil implements ActionListener {
         this.reserver = reserver;
         this.paiementDAO = paiementDAO;
         this.avisDAO = avisDAO;
+        this.userDAO = userDAO;
 
         this.vueAccueil.ajouterEcouteur(this);
         this.vueAccueil.setVisible(false);
@@ -75,10 +76,19 @@ public class Accueil implements ActionListener {
 
             case "RESERVER":
                 vueReservation = new VueReservation(vueAccueil);
-                reserver = new Reserver(vueAccueil, hebergementDAO, reservationDAO,paiementDAO, vueReservation, avisDAO);
+                reserver = new Reserver(vueAccueil, hebergementDAO, reservationDAO,paiementDAO, vueReservation, avisDAO, userDAO);
                 vueReservation.ajouterEcouteur(reserver);
                 vueReservation.setVisible(true);
                 break;
+
+            case "NAV_MES_RESERVATIONS":
+                lancerVueMesReservations();
+                break;
+
+            case "NAV_ACCUEIL":
+                vueAccueil.setVisible(true);
+                break;
+
 
             default:
                 vueAccueil.afficherMessage("Action inconnue : " + action);
@@ -97,5 +107,10 @@ public class Accueil implements ActionListener {
         vueAccueil.afficherListeHebergements(hebergementsAffiches);
     }
 
+    private void lancerVueMesReservations() {
+        VueMesReservations vueMesReservations = new VueMesReservations(reservationDAO, hebergementDAO, avisDAO);
+        vueMesReservations.setVisible(true);
+    }
 
 }
+

@@ -174,4 +174,27 @@ public class UserDAOImpl implements UserDAO {
             System.out.println("Erreur lors de la suppression de l'utilisateur.");
         }
     }
+
+    public void updateTypeUtilisateur(int userId, String nouveauType) {
+        String sql = "UPDATE Utilisateurs SET type_utilisateur = ? WHERE utilisateur_id = ?";
+
+        try {
+            Connection connexion = daoFactory.getConnection();
+            PreparedStatement pstmt = connexion.prepareStatement(sql);
+
+            pstmt.setString(1, nouveauType);
+            pstmt.setInt(2, userId);
+
+            int rowsUpdated = pstmt.executeUpdate();
+            if (rowsUpdated > 0) {
+                System.out.println("Type d'utilisateur mis à jour avec succès pour l'utilisateur ID : " + userId);
+            } else {
+                System.out.println("Aucun utilisateur trouvé avec l'ID : " + userId);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Erreur lors de la mise à jour du type d'utilisateur.");
+        }
+    }
+
 }
