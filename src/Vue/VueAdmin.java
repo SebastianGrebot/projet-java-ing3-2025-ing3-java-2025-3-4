@@ -17,7 +17,7 @@ public class VueAdmin extends JFrame {
 
     public VueAdmin() {
         setTitle("Connexion administrateur");
-        setSize(450, 450);
+        setSize(450, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);
