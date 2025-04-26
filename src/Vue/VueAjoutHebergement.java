@@ -21,10 +21,9 @@ public class VueAjoutHebergement extends JFrame {
     // Boutons d'action
     private JButton boutonAjouter;
     private JButton boutonRetour;
-    
+
     // Barre de navigation
     private JButton boutonAccueil;
-    private JButton boutonMesReservations;
     private JButton boutonDeconnexion;
 
     // Couleurs et polices pour un style cohérent
@@ -52,12 +51,10 @@ public class VueAjoutHebergement extends JFrame {
         barreNavigation.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         boutonAccueil = createNavButton("Accueil", "NAV_ACCUEIL");
-        boutonMesReservations = createNavButton("Mes Réservations", "NAV_MES_RESERVATIONS");
         boutonDeconnexion = createNavButton("Déconnexion", "DECONNEXION");
 
         barreNavigation.add(boutonAccueil);
         barreNavigation.add(Box.createHorizontalStrut(15));
-        barreNavigation.add(boutonMesReservations);
         barreNavigation.add(Box.createHorizontalGlue());
         barreNavigation.add(boutonDeconnexion);
 
@@ -86,20 +83,20 @@ public class VueAjoutHebergement extends JFrame {
         champAdresse = createTextField();
         champVille = createTextField();
         champPays = createTextField();
-        
+
         String[] categories = {"Appartement", "Hôtel", "Villa", "Camping", "Resort"};
         comboCategorie = new JComboBox<>(categories);
         comboCategorie.setFont(policeNormale);
-        
+
         champPrix = createTextField();
-        
+
         champDescription = new JTextArea(3, 20);
         champDescription.setFont(policeNormale);
         champDescription.setLineWrap(true);
         champDescription.setWrapStyleWord(true);
         JScrollPane scrollDescription = new JScrollPane(champDescription);
         scrollDescription.setBorder(BorderFactory.createLineBorder(couleurBordure));
-        
+
         champPhoto = createTextField();
         boutonParcourir = new JButton("Parcourir...");
         boutonParcourir.setFont(policeNormale);
@@ -112,7 +109,7 @@ public class VueAjoutHebergement extends JFrame {
         JPanel panelPhoto = new JPanel(new BorderLayout(5, 0));
         panelPhoto.add(champPhoto, BorderLayout.CENTER);
         panelPhoto.add(boutonParcourir, BorderLayout.EAST);
-        
+
         // Boutons d'action
         boutonAjouter = new JButton("Ajouter");
         boutonAjouter.setFont(policeNormale);
@@ -121,7 +118,7 @@ public class VueAjoutHebergement extends JFrame {
         boutonAjouter.setFocusPainted(false);
         boutonAjouter.setCursor(new Cursor(Cursor.HAND_CURSOR));
         boutonAjouter.setActionCommand("AJOUTER_HEBERGEMENT");
-        
+
         boutonRetour = new JButton("Retour");
         boutonRetour.setFont(policeNormale);
         boutonRetour.setBackground(couleurSecondaire);
@@ -133,52 +130,52 @@ public class VueAjoutHebergement extends JFrame {
         // Ajout des composants au formulaire
         gbc.gridx = 0; gbc.gridy = 0; gbc.anchor = GridBagConstraints.LINE_START;
         panelFormulaire.add(createLabel("Nom :"), gbc);
-        
+
         gbc.gridx = 1; gbc.gridy = 0;
         panelFormulaire.add(champNom, gbc);
-        
+
         gbc.gridx = 0; gbc.gridy = 1;
         panelFormulaire.add(createLabel("Adresse :"), gbc);
-        
+
         gbc.gridx = 1; gbc.gridy = 1;
         panelFormulaire.add(champAdresse, gbc);
-        
+
         gbc.gridx = 0; gbc.gridy = 2;
         panelFormulaire.add(createLabel("Ville :"), gbc);
-        
+
         gbc.gridx = 1; gbc.gridy = 2;
         panelFormulaire.add(champVille, gbc);
-        
+
         gbc.gridx = 0; gbc.gridy = 3;
         panelFormulaire.add(createLabel("Pays :"), gbc);
-        
+
         gbc.gridx = 1; gbc.gridy = 3;
         panelFormulaire.add(champPays, gbc);
-        
+
         gbc.gridx = 0; gbc.gridy = 4;
         panelFormulaire.add(createLabel("Catégorie :"), gbc);
-        
+
         gbc.gridx = 1; gbc.gridy = 4;
         panelFormulaire.add(comboCategorie, gbc);
-        
+
         gbc.gridx = 0; gbc.gridy = 5;
         panelFormulaire.add(createLabel("Prix par nuit (€) :"), gbc);
-        
+
         gbc.gridx = 1; gbc.gridy = 5;
         panelFormulaire.add(champPrix, gbc);
-        
+
         gbc.gridx = 0; gbc.gridy = 6;
         panelFormulaire.add(createLabel("Description :"), gbc);
-        
+
         gbc.gridx = 1; gbc.gridy = 6;
         panelFormulaire.add(scrollDescription, gbc);
-        
+
         gbc.gridx = 0; gbc.gridy = 7;
         panelFormulaire.add(createLabel("Photo (chemin) :"), gbc);
-        
+
         gbc.gridx = 1; gbc.gridy = 7;
         panelFormulaire.add(panelPhoto, gbc);
-        
+
         // Panel pour les boutons
         JPanel panelBoutons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
         panelBoutons.setBackground(Color.WHITE);
@@ -188,7 +185,7 @@ public class VueAjoutHebergement extends JFrame {
         // --- Layout global ---
         JPanel panelHaut = new JPanel(new BorderLayout());
         panelHaut.add(barreNavigation, BorderLayout.NORTH);
-        
+
         panelPrincipal.add(panelHaut, BorderLayout.NORTH);
         panelPrincipal.add(panelFormulaire, BorderLayout.CENTER);
         panelPrincipal.add(panelBoutons, BorderLayout.SOUTH);
@@ -218,8 +215,8 @@ public class VueAjoutHebergement extends JFrame {
         textField.setFont(policeNormale);
         textField.setMargin(new Insets(5, 5, 5, 5));
         textField.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(couleurBordure),
-            BorderFactory.createEmptyBorder(5, 5, 5, 5)
+                BorderFactory.createLineBorder(couleurBordure),
+                BorderFactory.createEmptyBorder(5, 5, 5, 5)
         ));
         return textField;
     }
@@ -248,7 +245,6 @@ public class VueAjoutHebergement extends JFrame {
         boutonAjouter.addActionListener(listener);
         boutonRetour.addActionListener(listener);
         boutonAccueil.addActionListener(listener);
-        boutonMesReservations.addActionListener(listener);
         boutonDeconnexion.addActionListener(listener);
     }
 
