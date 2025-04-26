@@ -12,14 +12,13 @@ public class VueAjouterReduction extends JFrame {
     private JTextField champDescription;
     private JTextField champDateDebut;
     private JTextField champDateFin;
-    
+
     // Boutons d'action
     private JButton boutonAjouter;
     private JButton boutonRetour;
-    
+
     // Barre de navigation
     private JButton boutonAccueil;
-    private JButton boutonMesReservations;
     private JButton boutonDeconnexion;
 
     // Couleurs et polices pour un style cohérent
@@ -47,12 +46,10 @@ public class VueAjouterReduction extends JFrame {
         barreNavigation.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         boutonAccueil = createNavButton("Accueil", "NAV_ACCUEIL");
-        boutonMesReservations = createNavButton("Mes Réservations", "NAV_MES_RESERVATIONS");
         boutonDeconnexion = createNavButton("Déconnexion", "DECONNEXION");
 
         barreNavigation.add(boutonAccueil);
         barreNavigation.add(Box.createHorizontalStrut(15));
-        barreNavigation.add(boutonMesReservations);
         barreNavigation.add(Box.createHorizontalGlue());
         barreNavigation.add(boutonDeconnexion);
 
@@ -82,7 +79,7 @@ public class VueAjouterReduction extends JFrame {
         champDescription = createTextField();
         champDateDebut = createTextField();
         champDateFin = createTextField();
-        
+
         // Boutons d'action
         boutonAjouter = new JButton("Ajouter la réduction");
         boutonAjouter.setFont(policeNormale);
@@ -91,7 +88,7 @@ public class VueAjouterReduction extends JFrame {
         boutonAjouter.setFocusPainted(false);
         boutonAjouter.setCursor(new Cursor(Cursor.HAND_CURSOR));
         boutonAjouter.setActionCommand("AJOUT_REDUCTION_BDD");
-        
+
         boutonRetour = new JButton("Retour à l'accueil");
         boutonRetour.setFont(policeNormale);
         boutonRetour.setBackground(couleurSecondaire);
@@ -103,34 +100,34 @@ public class VueAjouterReduction extends JFrame {
         // Ajout des composants au formulaire
         gbc.gridx = 0; gbc.gridy = 0; gbc.anchor = GridBagConstraints.LINE_START;
         panelFormulaire.add(createLabel("ID Hébergement :"), gbc);
-        
+
         gbc.gridx = 1; gbc.gridy = 0;
         panelFormulaire.add(champHebergementId, gbc);
-        
+
         gbc.gridx = 0; gbc.gridy = 1;
         panelFormulaire.add(createLabel("Pourcentage de réduction :"), gbc);
-        
+
         gbc.gridx = 1; gbc.gridy = 1;
         panelFormulaire.add(champPourcentage, gbc);
-        
+
         gbc.gridx = 0; gbc.gridy = 2;
         panelFormulaire.add(createLabel("Description :"), gbc);
-        
+
         gbc.gridx = 1; gbc.gridy = 2;
         panelFormulaire.add(champDescription, gbc);
-        
+
         gbc.gridx = 0; gbc.gridy = 3;
         panelFormulaire.add(createLabel("Date début (YYYY-MM-DD) :"), gbc);
-        
+
         gbc.gridx = 1; gbc.gridy = 3;
         panelFormulaire.add(champDateDebut, gbc);
-        
+
         gbc.gridx = 0; gbc.gridy = 4;
         panelFormulaire.add(createLabel("Date fin (YYYY-MM-DD) :"), gbc);
-        
+
         gbc.gridx = 1; gbc.gridy = 4;
         panelFormulaire.add(champDateFin, gbc);
-        
+
         // Panel pour les boutons
         JPanel panelBoutons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
         panelBoutons.setBackground(Color.WHITE);
@@ -140,7 +137,7 @@ public class VueAjouterReduction extends JFrame {
         // --- Layout global ---
         JPanel panelHaut = new JPanel(new BorderLayout());
         panelHaut.add(barreNavigation, BorderLayout.NORTH);
-        
+
         panelPrincipal.add(panelHaut, BorderLayout.NORTH);
         panelPrincipal.add(panelFormulaire, BorderLayout.CENTER);
         panelPrincipal.add(panelBoutons, BorderLayout.SOUTH);
@@ -170,8 +167,8 @@ public class VueAjouterReduction extends JFrame {
         textField.setFont(policeNormale);
         textField.setMargin(new Insets(5, 5, 5, 5));
         textField.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(couleurBordure),
-            BorderFactory.createEmptyBorder(5, 5, 5, 5)
+                BorderFactory.createLineBorder(couleurBordure),
+                BorderFactory.createEmptyBorder(5, 5, 5, 5)
         ));
         return textField;
     }
@@ -201,7 +198,6 @@ public class VueAjouterReduction extends JFrame {
         boutonAjouter.addActionListener(listener);
         boutonRetour.addActionListener(listener);
         boutonAccueil.addActionListener(listener);
-        boutonMesReservations.addActionListener(listener);
         boutonDeconnexion.addActionListener(listener);
     }
 
