@@ -4,13 +4,16 @@ import Controleur.Inscription;
 import Dao.HebergementDAOImpl;
 import Modele.Hebergement;
 import Modele.Reduction;
+import Modele.Chambre;
 
 import javax.swing.*;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -20,91 +23,126 @@ public class VueReservation extends JFrame {
     private JSpinner dateDepartSpinner;
     private JSpinner spinnerNbAdultes;
     private JSpinner spinnerNbEnfants;
+    private JSpinner spinnerNbChambres;
+    private JLabel labelChambresFixes;
+
     private JTextField champPrixParNuit;
     private JTextField champPrixTotal;
     private JLabel labelReduction;
     private JButton btnValider;
     private JLabel labelMessage;
 
+    // Boutons navigation
+    private JButton boutonAccueil;
+    private JButton boutonRetour;
+    private JButton boutonDeconnexion;
+
     private VueAccueil vueAccueil;
     private HebergementDAOImpl hebergementDAO;
-
-    private final Color couleurPrincipale = new Color(60, 141, 188);
-    private final Color couleurFond = new Color(245, 245, 245);
 
     public VueReservation(VueAccueil vueAccueil, HebergementDAOImpl hebergementDAO) {
         this.vueAccueil = vueAccueil;
         this.hebergementDAO = hebergementDAO;
 
         setTitle("Réservation");
-        setSize(550, 550);
+        setSize(600, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-        getContentPane().setBackground(couleurFond);
+        setLayout(new BorderLayout(10, 10));
+        getContentPane().setBackground(new Color(245, 245, 245));
 
-        JPanel panelPrincipal = new JPanel(new BorderLayout());
-        panelPrincipal.setOpaque(false);
+        // ===== Barre navigation =====
+        JPanel panelNavigation = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
+        panelNavigation.setBackground(Color.WHITE);
 
-        JPanel panelForm = new JPanel();
-        panelForm.setLayout(new BoxLayout(panelForm, BoxLayout.Y_AXIS));
-        panelForm.setBackground(Color.WHITE);
-        panelForm.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(220, 220, 220)),
-                BorderFactory.createEmptyBorder(20, 30, 20, 30)
-        ));
+        boutonAccueil = new JButton("Accueil");
+        boutonRetour = new JButton("Retour");
+        boutonDeconnexion = new JButton("Déconnexion");
 
-        panelForm.add(creerLigne("Date d'arrivée :", dateArriveeSpinner = createDateSpinner(0)));
-        panelForm.add(creerLigne("Date de départ :", dateDepartSpinner = createDateSpinner(1)));
-        panelForm.add(creerLigne("Nombre d'adultes :", spinnerNbAdultes = new JSpinner(new SpinnerNumberModel(1, 1, 10, 1))));
-        panelForm.add(creerLigne("Nombre d'enfants :", spinnerNbEnfants = new JSpinner(new SpinnerNumberModel(0, 0, 10, 1))));
-        panelForm.add(creerLigne("Prix par nuit (€) :", champPrixParNuit = createTextField()));
-        panelForm.add(creerLigne("Réduction appliquée :", labelReduction = new JLabel("-")));
-        labelReduction.setFont(new Font("Arial", Font.PLAIN, 14));
-        labelReduction.setForeground(Color.BLACK);
-        panelForm.add(creerLigne("Prix total (€) :", champPrixTotal = createTextField()));
+        styliserBoutonNavigation(boutonAccueil);
+        styliserBoutonNavigation(boutonRetour);
+        styliserBoutonNavigation(boutonDeconnexion);
 
+        panelNavigation.add(boutonAccueil);
+        panelNavigation.add(boutonRetour);
+        panelNavigation.add(boutonDeconnexion);
+
+        add(panelNavigation, BorderLayout.NORTH);
+
+        // ===== Formulaire de réservation =====
+        JPanel panel = new JPanel(new GridLayout(11, 2, 10, 10));
+        panel.setBackground(Color.WHITE);
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        JLabel labelDateArrivee = new JLabel("Date d'arrivée :");
+        dateArriveeSpinner = createDateSpinner(0);
+
+        JLabel labelDateDepart = new JLabel("Date de départ :");
+        dateDepartSpinner = createDateSpinner(1);
+
+        JLabel labelNbAdultes = new JLabel("Nombre d'adultes :");
+        spinnerNbAdultes = new JSpinner(new SpinnerNumberModel(1, 1, 100, 1));
+
+        JLabel labelNbEnfants = new JLabel("Nombre d'enfants :");
+        spinnerNbEnfants = new JSpinner(new SpinnerNumberModel(0, 0, 100, 1));
+
+        JLabel labelNbChambres = new JLabel("Nombre de chambres :");
+        spinnerNbChambres = new JSpinner(new SpinnerNumberModel(1, 1, 100, 1));
+        labelChambresFixes = new JLabel("");
+        labelChambresFixes.setVisible(false);
+
+        JLabel labelPrixParNuit = new JLabel("Prix par nuit (€) :");
+        champPrixParNuit = new JTextField();
         champPrixParNuit.setEditable(false);
+
+        JLabel labelReductionTitre = new JLabel("Réduction appliquée :");
+        labelReduction = new JLabel("");
+        labelReduction.setForeground(new Color(0, 0, 0));
+
+        JLabel labelPrixTotal = new JLabel("Prix total (€) :");
+        champPrixTotal = new JTextField();
         champPrixTotal.setEditable(false);
 
-        labelMessage = new JLabel("", SwingConstants.CENTER);
+        labelMessage = new JLabel("");
+        labelMessage.setHorizontalAlignment(SwingConstants.CENTER);
         labelMessage.setForeground(Color.RED);
-        labelMessage.setFont(new Font("Arial", Font.BOLD, 14));
-        panelForm.add(Box.createRigidArea(new Dimension(0, 10)));
-        panelForm.add(labelMessage);
 
         btnValider = new JButton("Valider la réservation");
         btnValider.setActionCommand("VALIDER_RESERVATION");
-        styliserBouton(btnValider);
-        JPanel boutonPanel = new JPanel();
-        boutonPanel.setBackground(Color.WHITE);
-        boutonPanel.add(btnValider);
 
-        panelForm.add(Box.createRigidArea(new Dimension(0, 10)));
-        panelForm.add(boutonPanel);
+        panel.add(labelDateArrivee); panel.add(dateArriveeSpinner);
+        panel.add(labelDateDepart); panel.add(dateDepartSpinner);
+        panel.add(labelNbAdultes); panel.add(spinnerNbAdultes);
+        panel.add(labelNbEnfants); panel.add(spinnerNbEnfants);
+        panel.add(labelNbChambres); panel.add(spinnerNbChambres);
+        panel.add(new JLabel("")); panel.add(labelChambresFixes);
+        panel.add(labelPrixParNuit); panel.add(champPrixParNuit);
+        panel.add(labelReductionTitre); panel.add(labelReduction);
+        panel.add(labelPrixTotal); panel.add(champPrixTotal);
+        panel.add(labelMessage); panel.add(btnValider);
 
-        panelPrincipal.add(panelForm, BorderLayout.CENTER);
-        add(panelPrincipal);
+        add(panel, BorderLayout.CENTER);
 
-        // Listeners pour recalculer automatiquement
         ChangeListener recalculListener = e -> calculerPrixTotal();
         dateArriveeSpinner.addChangeListener(recalculListener);
         dateDepartSpinner.addChangeListener(recalculListener);
         spinnerNbAdultes.addChangeListener(recalculListener);
         spinnerNbEnfants.addChangeListener(recalculListener);
+        spinnerNbChambres.addChangeListener(recalculListener);
 
-        // Calcul initial au chargement
         SwingUtilities.invokeLater(this::calculerPrixTotal);
+
+        // === Écouteurs navigation ===
+        boutonAccueil.addActionListener(e -> retournerAccueil());
+        boutonRetour.addActionListener(e -> retournerAccueil());
+        boutonDeconnexion.addActionListener(e -> deconnecterUtilisateur());
     }
 
-    private JPanel creerLigne(String labelTexte, JComponent composant) {
-        JPanel panel = new JPanel(new BorderLayout(5, 5));
-        panel.setBackground(Color.WHITE);
-        JLabel label = new JLabel(labelTexte);
-        label.setFont(new Font("Arial", Font.PLAIN, 16));
-        panel.add(label, BorderLayout.WEST);
-        panel.add(composant, BorderLayout.CENTER);
-        panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
-        return panel;
+    private void styliserBoutonNavigation(JButton bouton) {
+        bouton.setBackground(new Color(100, 149, 237));
+        bouton.setForeground(Color.WHITE);
+        bouton.setFocusPainted(false);
+        bouton.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
 
     private JSpinner createDateSpinner(int daysToAdd) {
@@ -121,21 +159,6 @@ public class VueReservation extends JFrame {
         return spinner;
     }
 
-    private JTextField createTextField() {
-        JTextField textField = new JTextField();
-        textField.setFont(new Font("Arial", Font.PLAIN, 14));
-        return textField;
-    }
-
-    private void styliserBouton(JButton bouton) {
-        bouton.setBackground(couleurPrincipale);
-        bouton.setForeground(Color.WHITE);
-        bouton.setFont(new Font("Arial", Font.BOLD, 16));
-        bouton.setFocusPainted(false);
-        bouton.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        bouton.setPreferredSize(new Dimension(220, 40));
-    }
-
     private void calculerPrixTotal() {
         try {
             Hebergement h = vueAccueil.getHebergementSelectionne();
@@ -143,42 +166,87 @@ public class VueReservation extends JFrame {
                 champPrixParNuit.setText("");
                 champPrixTotal.setText("");
                 labelMessage.setText("Aucun hébergement sélectionné.");
-                labelReduction.setText("-");
+                labelReduction.setText("");
                 return;
             }
 
             double prixParNuit = h.getPrixParNuit();
-            labelReduction.setText("-");
+            labelReduction.setText("");
 
             if (Objects.equals(Inscription.getUtilisateurConnecte().getTypeUtilisateur(), "ancien")) {
                 Reduction reduction = hebergementDAO.getReductionParHebergement(h.getId());
                 if (reduction != null) {
-                    prixParNuit = prixParNuit * (1 - reduction.getPourcentage() / 100.0);
+                    prixParNuit *= (1 - reduction.getPourcentage() / 100.0);
                     labelReduction.setForeground(new Color(0, 128, 0));
                     labelReduction.setText(reduction.getPourcentage() + "% de réduction appliquée");
                 } else {
                     labelReduction.setText("-");
                 }
+            } else {
+                labelReduction.setText("-");
             }
 
             champPrixParNuit.setText(String.format(Locale.US, "%.2f", prixParNuit));
 
             Date dateArrivee = resetTime((Date) dateArriveeSpinner.getValue());
             Date dateDepart = resetTime((Date) dateDepartSpinner.getValue());
-            int nbAdultes = (int) spinnerNbAdultes.getValue();
-            int nbEnfants = (int) spinnerNbEnfants.getValue();
 
             if (!dateDepart.after(dateArrivee)) {
                 champPrixTotal.setText("");
-                labelMessage.setText("La date de départ doit être après la date d'arrivée.");
+                labelMessage.setText("La date de départ doit être après celle d'arrivée.");
                 return;
             }
 
             long difference = dateDepart.getTime() - dateArrivee.getTime();
             long nombreNuits = Math.max(1, difference / (1000 * 60 * 60 * 24));
 
-            double prixTotal = prixParNuit * nombreNuits * nbAdultes
-                    + (prixParNuit * 0.5 * nbEnfants * nombreNuits);
+            int nbAdultes = (int) spinnerNbAdultes.getValue();
+            int nbEnfants = (int) spinnerNbEnfants.getValue();
+            int nbPersonnes = nbAdultes + nbEnfants;
+
+            boolean estHotel = h.getCategorie().equalsIgnoreCase("hotel");
+            double prixTotal;
+
+            if (estHotel) {
+                spinnerNbChambres.setVisible(true);
+                spinnerNbChambres.setEnabled(true);
+                labelChambresFixes.setVisible(true);
+
+                List<Chambre> chambresDisponibles = hebergementDAO.getChambresDisponibles(h.getId());
+                int nbChambresDispo = chambresDisponibles.size();
+                labelChambresFixes.setText(nbChambresDispo + " chambre(s) disponible(s)");
+
+                SpinnerNumberModel model = (SpinnerNumberModel) spinnerNbChambres.getModel();
+                model.setMaximum(nbChambresDispo);
+
+                int nbChambresDemandees = (int) spinnerNbChambres.getValue();
+                if (nbChambresDemandees > nbChambresDispo) {
+                    labelMessage.setText("Pas assez de chambres disponibles.");
+                    champPrixTotal.setText("");
+                    return;
+                }
+
+                int capaciteTotale = 0;
+                for (int i = 0; i < nbChambresDemandees && i < chambresDisponibles.size(); i++) {
+                    capaciteTotale += chambresDisponibles.get(i).getPlaceMax();
+                }
+
+                if (capaciteTotale < nbPersonnes) {
+                    labelMessage.setText("La capacité des chambres sélectionnées est insuffisante.");
+                    champPrixTotal.setText("");
+                    return;
+                }
+
+                prixTotal = prixParNuit * nombreNuits * nbChambresDemandees;
+
+            } else {
+                spinnerNbChambres.setVisible(false);
+                spinnerNbChambres.setEnabled(false);
+                labelChambresFixes.setVisible(true);
+                labelChambresFixes.setText("Logement avec " + h.getNbChambres() + " chambre(s)");
+
+                prixTotal = prixParNuit * nombreNuits;
+            }
 
             champPrixTotal.setText(String.format(Locale.US, "%.2f", prixTotal));
             labelMessage.setText("");
@@ -187,7 +255,7 @@ public class VueReservation extends JFrame {
             e.printStackTrace();
             champPrixTotal.setText("");
             labelMessage.setText("Erreur lors du calcul.");
-            labelReduction.setText("-");
+            labelReduction.setText("");
         }
     }
 
@@ -201,20 +269,24 @@ public class VueReservation extends JFrame {
         return cal.getTime();
     }
 
-    public Date getDateArrivee() { return (Date) dateArriveeSpinner.getValue(); }
-    public Date getDateDepart() { return (Date) dateDepartSpinner.getValue(); }
-    public int getNbAdultes() { return (int) spinnerNbAdultes.getValue(); }
-    public int getNbEnfants() { return (int) spinnerNbEnfants.getValue(); }
-    public double getPrixTotal() {
-        try {
-            return Double.parseDouble(champPrixTotal.getText().replace(",", "."));
-        } catch (NumberFormatException e) {
-            System.err.println("Erreur de conversion prix total : " + champPrixTotal.getText());
-            return 0.0;
-        }
-    }
-
     public void ajouterEcouteur(ActionListener listener) {
         btnValider.addActionListener(listener);
+    }
+
+    // === Navigation ===
+    private void retournerAccueil() {
+        this.setVisible(false);
+        vueAccueil.setVisible(true);
+    }
+
+    private void deconnecterUtilisateur() {
+        int confirm = JOptionPane.showConfirmDialog(this,
+                "Voulez-vous vraiment vous déconnecter ?", "Confirmation", JOptionPane.YES_NO_OPTION);
+        if (confirm == JOptionPane.YES_OPTION) {
+            this.dispose();
+            vueAccueil.dispose();
+            VueConnexion vueConnexion = new VueConnexion();
+            vueConnexion.setVisible(true);
+        }
     }
 }
