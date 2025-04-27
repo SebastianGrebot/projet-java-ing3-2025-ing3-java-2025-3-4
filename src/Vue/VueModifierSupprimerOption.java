@@ -1,6 +1,7 @@
 package Vue;
 
 import javax.swing.*;
+import javax.swing.border.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 
@@ -9,128 +10,163 @@ public class VueModifierSupprimerOption extends JFrame {
     private JTextField champNom;
     private JButton boutonModifier;
     private JButton boutonSupprimer;
+    
+    // Barre de navigation
     private JButton boutonAccueil;
-    private JButton boutonRetour;
+    private JButton boutonMesReservations;
     private JButton boutonDeconnexion;
 
-    // Couleurs et polices communes
+    // Couleurs et polices pour un style cohérent
     private final Color couleurPrincipale = new Color(60, 141, 188);
-    private final Color couleurFond = new Color(245, 245, 245);
+    private final Color couleurSecondaire = new Color(245, 245, 245);
+    private final Color couleurBordure = new Color(220, 220, 220);
     private final Font policeNormale = new Font("Arial", Font.PLAIN, 14);
     private final Font policeTitre = new Font("Arial", Font.BOLD, 16);
 
     public VueModifierSupprimerOption() {
-        setTitle("Modifier ou Supprimer une option");
-        setSize(500, 300);
+        setTitle("Modifier/Supprimer une option");
+        setSize(600, 400);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
-        getContentPane().setBackground(couleurFond);
-        setLayout(new BorderLayout(10, 10));
 
-        // ===== Barre de navigation en haut =====
-        JPanel panelNavigation = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
-        panelNavigation.setBackground(Color.WHITE);
+        // Panel principal avec une marge
+        JPanel panelPrincipal = new JPanel(new BorderLayout(10, 10));
+        panelPrincipal.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+        setContentPane(panelPrincipal);
 
-        boutonAccueil = new JButton("Accueil");
-        boutonRetour = new JButton("Retour");
-        boutonDeconnexion = new JButton("Déconnexion");
+        // --- Barre de navigation en haut avec style amélioré ---
+        JPanel barreNavigation = new JPanel();
+        barreNavigation.setLayout(new BoxLayout(barreNavigation, BoxLayout.X_AXIS));
+        barreNavigation.setBackground(couleurPrincipale);
+        barreNavigation.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        styliserBoutonNavigation(boutonAccueil);
-        styliserBoutonNavigation(boutonRetour);
-        styliserBoutonNavigation(boutonDeconnexion);
+        boutonAccueil = createNavButton("Accueil", "NAV_ACCUEIL");
+        boutonMesReservations = createNavButton("Mes Réservations", "NAV_MES_RESERVATIONS");
+        boutonDeconnexion = createNavButton("Déconnexion", "DECONNEXION");
 
-        panelNavigation.add(boutonAccueil);
-        panelNavigation.add(boutonRetour);
-        panelNavigation.add(boutonDeconnexion);
+        barreNavigation.add(boutonAccueil);
+        barreNavigation.add(Box.createHorizontalStrut(15));
+        barreNavigation.add(boutonMesReservations);
+        barreNavigation.add(Box.createHorizontalGlue());
+        barreNavigation.add(boutonDeconnexion);
 
-        add(panelNavigation, BorderLayout.NORTH);
-
-        // ===== Formulaire principal =====
-        champId = new JTextField(10);
-        champNom = new JTextField(20);
-        boutonModifier = new JButton("Modifier");
-        boutonSupprimer = new JButton("Supprimer");
-
-        boutonModifier.setActionCommand("MODIFIER_OPTION");
-        boutonSupprimer.setActionCommand("SUPPRIMER_OPTION");
-
-        styliserBouton(boutonModifier);
-        styliserBouton(boutonSupprimer);
-
-        JPanel panelForm = new JPanel();
-        panelForm.setBackground(Color.WHITE);
-        panelForm.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(220, 220, 220)),
-                BorderFactory.createEmptyBorder(20, 20, 20, 20)
+        // --- Panel du formulaire avec style cohérent ---
+        JPanel panelFormulaire = new JPanel(new GridBagLayout());
+        panelFormulaire.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createTitledBorder(
+                        BorderFactory.createLineBorder(couleurBordure, 1),
+                        "Modifier ou supprimer une option",
+                        TitledBorder.DEFAULT_JUSTIFICATION,
+                        TitledBorder.DEFAULT_POSITION,
+                        policeTitre,
+                        couleurPrincipale
+                ),
+                BorderFactory.createEmptyBorder(15, 15, 15, 15)
         ));
-        panelForm.setLayout(new GridBagLayout());
+        panelFormulaire.setBackground(Color.WHITE);
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.gridx = 0;
-        gbc.gridy = 0;
+        gbc.insets = new Insets(5, 5, 10, 10);
+        gbc.weightx = 1.0;
 
-        JLabel labelId = new JLabel("ID de l'option :");
-        labelId.setFont(policeNormale);
-        panelForm.add(labelId, gbc);
+        // Création des champs avec style cohérent
+        champId = createTextField();
+        champNom = createTextField();
+        
+        // Boutons d'action
+        boutonModifier = new JButton("Modifier l'option");
+        boutonModifier.setFont(policeNormale);
+        boutonModifier.setBackground(couleurPrincipale);
+        boutonModifier.setForeground(Color.WHITE);
+        boutonModifier.setFocusPainted(false);
+        boutonModifier.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        boutonModifier.setActionCommand("MODIFIER_OPTION");
+        
+        boutonSupprimer = new JButton("Supprimer l'option");
+        boutonSupprimer.setFont(policeNormale);
+        boutonSupprimer.setBackground(new Color(220, 53, 69)); // Rouge pour suppression
+        boutonSupprimer.setForeground(Color.WHITE);
+        boutonSupprimer.setFocusPainted(false);
+        boutonSupprimer.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        boutonSupprimer.setActionCommand("SUPPRIMER_OPTION");
 
-        gbc.gridx = 1;
-        panelForm.add(champId, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        JLabel labelNom = new JLabel("Nouveau nom :");
-        labelNom.setFont(policeNormale);
-        panelForm.add(labelNom, gbc);
-
-        gbc.gridx = 1;
-        panelForm.add(champNom, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.gridwidth = 2;
-
-        JPanel panelBoutons = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 0));
+        // Ajout des composants au formulaire
+        gbc.gridx = 0; gbc.gridy = 0; gbc.anchor = GridBagConstraints.LINE_START;
+        panelFormulaire.add(createLabel("ID de l'option :"), gbc);
+        
+        gbc.gridx = 1; gbc.gridy = 0;
+        panelFormulaire.add(champId, gbc);
+        
+        gbc.gridx = 0; gbc.gridy = 1;
+        panelFormulaire.add(createLabel("Nouveau nom :"), gbc);
+        
+        gbc.gridx = 1; gbc.gridy = 1;
+        panelFormulaire.add(champNom, gbc);
+        
+        // Panel pour les boutons
+        JPanel panelBoutons = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
         panelBoutons.setBackground(Color.WHITE);
         panelBoutons.add(boutonModifier);
         panelBoutons.add(boutonSupprimer);
-        panelForm.add(panelBoutons, gbc);
 
-        add(panelForm, BorderLayout.CENTER);
+        // --- Layout global ---
+        JPanel panelHaut = new JPanel(new BorderLayout());
+        panelHaut.add(barreNavigation, BorderLayout.NORTH);
+        
+        panelPrincipal.add(panelHaut, BorderLayout.NORTH);
+        panelPrincipal.add(panelFormulaire, BorderLayout.CENTER);
+        panelPrincipal.add(panelBoutons, BorderLayout.SOUTH);
     }
 
-    private void styliserBouton(JButton bouton) {
-        bouton.setBackground(couleurPrincipale);
-        bouton.setForeground(Color.WHITE);
-        bouton.setFont(policeNormale);
-        bouton.setFocusPainted(false);
-        bouton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+    // Méthodes utilitaires pour créer des composants avec style cohérent
+    private JButton createNavButton(String text, String action) {
+        JButton button = new JButton(text);
+        button.setFont(policeNormale);
+        button.setActionCommand(action);
+        button.setBorderPainted(false);
+        button.setFocusPainted(false);
+        button.setBackground(couleurPrincipale);
+        button.setForeground(Color.WHITE);
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        return button;
     }
 
-    private void styliserBoutonNavigation(JButton bouton) {
-        bouton.setBackground(new Color(100, 149, 237));
-        bouton.setForeground(Color.WHITE);
-        bouton.setFont(policeNormale);
-        bouton.setFocusPainted(false);
-        bouton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+    private JLabel createLabel(String text) {
+        JLabel label = new JLabel(text);
+        label.setFont(policeNormale);
+        return label;
     }
 
-    // Getters pour récupérer les champs
+    private JTextField createTextField() {
+        JTextField textField = new JTextField();
+        textField.setFont(policeNormale);
+        textField.setMargin(new Insets(5, 5, 5, 5));
+        textField.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(couleurBordure),
+            BorderFactory.createEmptyBorder(5, 5, 5, 5)
+        ));
+        return textField;
+    }
+
+    // Getters pour les valeurs des champs
     public int getIdOption() {
-        return Integer.parseInt(champId.getText());
+        try {
+            return Integer.parseInt(champId.getText());
+        } catch (NumberFormatException e) {
+            return -1;
+        }
     }
 
     public String getNouveauNomOption() {
         return champNom.getText();
     }
 
-    // Ajout d'écouteurs pour tous les boutons
     public void ajouterEcouteur(ActionListener listener) {
         boutonModifier.addActionListener(listener);
         boutonSupprimer.addActionListener(listener);
         boutonAccueil.addActionListener(listener);
-        boutonRetour.addActionListener(listener);
+        boutonMesReservations.addActionListener(listener);
         boutonDeconnexion.addActionListener(listener);
     }
 
@@ -141,18 +177,5 @@ public class VueModifierSupprimerOption extends JFrame {
     public void resetChamps() {
         champId.setText("");
         champNom.setText("");
-    }
-
-    // Getters pour les boutons navigation si besoin
-    public JButton getBoutonAccueil() {
-        return boutonAccueil;
-    }
-
-    public JButton getBoutonRetour() {
-        return boutonRetour;
-    }
-
-    public JButton getBoutonDeconnexion() {
-        return boutonDeconnexion;
     }
 }
